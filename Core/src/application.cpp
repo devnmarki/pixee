@@ -100,5 +100,10 @@ namespace pixee
 		{
 			return m_Window->getRenderer();
 		}
+
+		std::vector<std::unique_ptr<Layer>>& Application::getLayerStack()
+		{
+			return m_LayerStack;
+		}
 	}
 }

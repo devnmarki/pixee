@@ -1,6 +1,8 @@
 #ifndef LAYER_HPP
 #define LAYER_HPP
 
+#include <memory>
+
 namespace pixee
 {
 	namespace core
@@ -13,6 +15,15 @@ namespace pixee
 			virtual void onAttach() {}
 			virtual void onUpdate() {}
 			virtual void onRender() {}
+
+			template<typename T, typename... Args>
+			void transitionTo(Args&&... args)
+			{
+				queueTransition(std::move(std::make_unique<T>(std::forward<Args>(args)...)));
+			}
+
+		private:
+			void queueTransition(std::unique_ptr<Layer> layer);
 		};
 	}
 }

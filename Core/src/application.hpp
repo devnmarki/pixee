@@ -50,15 +50,18 @@ namespace pixee
 				return nullptr;
 			}
 
+			using LayerStack = std::vector<std::unique_ptr<Layer>>;
+
 			std::shared_ptr<Window> getWindow() const;
 			SDL_Renderer* getRenderer() const;
+			LayerStack& getLayerStack();
 
 		private:
 			ApplicationSpecification m_Specs;
 			std::shared_ptr<Window> m_Window;
 			bool m_IsRunning;
 
-			std::vector<std::unique_ptr<Layer>> m_LayerStack;
+			LayerStack m_LayerStack;
 		};
 	}
 }
