@@ -33,8 +33,28 @@ namespace pixee
 
 		void Application::run()
 		{
+			const int TARGET_FPS = 60;
+			const int FRAME_DELAY = 1000 / TARGET_FPS;
+
+			uint32_t frameStart;
+			int frameTime;
+
+			uint32_t lastTime = SDL_GetTicks();
+			float deltaTime = 0.0f;
+
 			while (m_IsRunning)
 			{
+				frameStart = SDL_GetTicks();
+
+				uint32_t currentTime = SDL_GetTicks();
+				deltaTime = (currentTime - frameStart) / 1000.0f;
+				lastTime = currentTime;
+
+				if (deltaTime > 0.1f)
+					deltaTime = 0.1f;
+
+				utils::Time::deltaTime = deltaTime;
+
 				SDL_Event event;
 				if (SDL_PollEvent(&event))
 				{
@@ -59,6 +79,10 @@ namespace pixee
 					layer->onRender();
 
 				m_Window->endFrame();
+
+				frameTime = SDL_GetTicks() - frameStart;
+				if (frameTime < FRAME_DELAY)
+					SDL_Delay(FRAME_DELAY - frameTime);
 			}
 		}
 

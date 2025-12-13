@@ -8,6 +8,7 @@
 
 #include "window.hpp"
 #include "layer.hpp"
+#include "utils.hpp"
 
 namespace pixee
 {
