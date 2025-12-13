@@ -3,9 +3,11 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
 #include <cassert>
 
 #include "window.hpp"
+#include "layer.hpp"
 
 namespace pixee
 {
@@ -26,8 +28,26 @@ namespace pixee
 			static Application& getInstance();
 
 			void run();
-
 			void quit();
+
+			template<typename T, typename... Args>
+			void pushLayer(Args&&... args)
+			{
+				m_LayerStack.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+				m_LayerStack.back()->onAttach();
+			}
+
+			template<typename T>
+			T* getLayer()
+			{
+				for (const auto& layer : m_LayerStack)
+				{
+					if (auto casted = dynamic_cast<T*>(layer.get()))
+						return casted;
+				}
+
+				return nullptr;
+			}
 
 			std::shared_ptr<Window> getWindow() const;
 			SDL_Renderer* getRenderer() const;
@@ -36,6 +56,8 @@ namespace pixee
 			ApplicationSpecification m_Specs;
 			std::shared_ptr<Window> m_Window;
 			bool m_IsRunning;
+
+			std::vector<std::unique_ptr<Layer>> m_LayerStack;
 		};
 	}
 }

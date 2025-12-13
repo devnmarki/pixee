@@ -33,6 +33,16 @@ namespace pixee
 			}
 		}
 
+		void Window::beginFrame() const
+		{
+			SDL_RenderClear(m_Renderer);
+		}
+
+		void Window::endFrame() const
+		{
+			SDL_RenderPresent(m_Renderer);
+		}
+
 		SDL_Window* Window::getHandle() const
 		{
 			return m_Handle;

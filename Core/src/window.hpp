@@ -24,6 +24,9 @@ namespace pixee
 
 			void create();
 
+			void beginFrame() const;
+			void endFrame() const;
+
 			SDL_Window* getHandle() const;
 			SDL_Renderer* getRenderer() const;
 

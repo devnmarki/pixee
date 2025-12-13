@@ -49,6 +49,16 @@ namespace pixee
 						break;
 					}
 				}
+
+				for (const auto& layer : m_LayerStack)
+					layer->onUpdate();
+
+				m_Window->beginFrame();
+				
+				for (const auto& layer : m_LayerStack)
+					layer->onRender();
+
+				m_Window->endFrame();
 			}
 		}
 
