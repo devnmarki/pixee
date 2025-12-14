@@ -5,10 +5,13 @@
 #include <memory>
 #include <vector>
 #include <cassert>
+#include <ranges>
+#include <unordered_set>
 
 #include "window.hpp"
 #include "layer.hpp"
 #include "utils.hpp"
+#include "event/key_events.hpp"
 
 namespace pixee
 {
@@ -49,6 +52,8 @@ namespace pixee
 
 				return nullptr;
 			}
+
+			void raiseEvent(event::Event& event);
 
 			using LayerStack = std::vector<std::unique_ptr<Layer>>;
 

@@ -14,6 +14,8 @@ namespace pixee
 			if (m_Specs.windowSpecs.title.empty())
 				m_Specs.windowSpecs.title = m_Specs.name;
 
+			m_Specs.windowSpecs.eventCallback = [this](event::Event& event) { raiseEvent(event); };
+
 			m_Window = std::make_shared<Window>(m_Specs.windowSpecs);
 			m_Window->create();
 		}
@@ -42,6 +44,8 @@ namespace pixee
 			uint32_t lastTime = SDL_GetTicks();
 			float deltaTime = 0.0f;
 
+			std::unordered_set<SDL_Keycode> heldKeys;
+
 			while (m_IsRunning)
 			{
 				frameStart = SDL_GetTicks();
@@ -63,10 +67,30 @@ namespace pixee
 					case SDL_QUIT:
 						quit();
 						break;
+					
 					case SDL_KEYDOWN:
-						if (event.key.keysym.sym = SDLK_ESCAPE)
+					{
+						SDL_Keycode key = event.key.keysym.sym;
+						bool repeat = event.key.repeat;
+
+						if (!repeat)
+						{
+							heldKeys.insert(key);
+							event::KeyPressedEvent keyPressed(key);
+							m_Window->raiseEvent(keyPressed);
+						}
+
+						if (key == SDLK_ESCAPE)
 							quit();
 						break;
+					}
+					
+					case SDL_KEYUP:
+					{
+						SDL_Keycode key = event.key.keysym.sym;
+						heldKeys.erase(key);
+						break;
+					}
 					}
 				}
 
@@ -89,6 +113,16 @@ namespace pixee
 		void Application::quit()
 		{
 			m_IsRunning = false;
+		}
+
+		void Application::raiseEvent(event::Event& event)
+		{
+			for (auto& layer : std::views::reverse(m_LayerStack))
+			{
+				layer->onEvent(event);
+				if (event.handled)
+					break;
+			}
 		}
 
 		std::shared_ptr<Window> Application::getWindow() const

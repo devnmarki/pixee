@@ -3,4 +3,6 @@
 
 #include "application.hpp"
 
+#include "event/key_events.hpp"
+
 #endif

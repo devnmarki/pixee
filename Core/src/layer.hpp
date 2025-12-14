@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "event/event.hpp"
+
 namespace pixee
 {
 	namespace core
@@ -15,6 +17,7 @@ namespace pixee
 			virtual void onAttach() {}
 			virtual void onUpdate() {}
 			virtual void onRender() {}
+			virtual void onEvent(event::Event& event) {}
 
 			template<typename T, typename... Args>
 			void transitionTo(Args&&... args)

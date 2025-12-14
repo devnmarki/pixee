@@ -1,6 +1,8 @@
 #ifndef EDITORLAYER_HPP
 #define EDITORLAYER_HPP
 
+#include <print>
+
 #include "core.hpp"
 
 namespace pixee
@@ -12,6 +14,10 @@ namespace pixee
 
 		void onAttach() override;
 		void onUpdate() override;
+		void onEvent(event::Event& event) override;
+
+	private:
+		bool onKeyPressedEvent(event::KeyPressedEvent& e);
 	};
 }
 
