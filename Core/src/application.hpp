@@ -3,9 +3,15 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
 #include <cassert>
+#include <ranges>
+#include <unordered_set>
 
 #include "window.hpp"
+#include "layer.hpp"
+#include "utils.hpp"
+#include "event/key_events.hpp"
 
 namespace pixee
 {
@@ -26,16 +32,41 @@ namespace pixee
 			static Application& getInstance();
 
 			void run();
-
 			void quit();
+
+			template<typename T, typename... Args>
+			void pushLayer(Args&&... args)
+			{
+				m_LayerStack.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+				m_LayerStack.back()->onAttach();
+			}
+
+			template<typename T>
+			T* getLayer()
+			{
+				for (const auto& layer : m_LayerStack)
+				{
+					if (auto casted = dynamic_cast<T*>(layer.get()))
+						return casted;
+				}
+
+				return nullptr;
+			}
+
+			void raiseEvent(event::Event& event);
+
+			using LayerStack = std::vector<std::unique_ptr<Layer>>;
 
 			std::shared_ptr<Window> getWindow() const;
 			SDL_Renderer* getRenderer() const;
+			LayerStack& getLayerStack();
 
 		private:
 			ApplicationSpecification m_Specs;
 			std::shared_ptr<Window> m_Window;
 			bool m_IsRunning;
+
+			LayerStack m_LayerStack;
 		};
 	}
 }

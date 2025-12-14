@@ -5,6 +5,8 @@
 
 #include <SDL.h>
 
+#include "event/event.hpp"
+
 namespace pixee
 {
 	namespace core
@@ -14,6 +16,11 @@ namespace pixee
 			std::string title;
 			int width;
 			int height;
+			bool isResizable = false;
+			bool enableVSync = false;
+
+			using EventCallback = std::function<void(event::Event&)>;
+			EventCallback eventCallback;
 		};
 
 		class Window
@@ -23,6 +30,11 @@ namespace pixee
 			~Window();
 
 			void create();
+
+			void beginFrame() const;
+			void endFrame() const;
+
+			void raiseEvent(event::Event& event);
 
 			SDL_Window* getHandle() const;
 			SDL_Renderer* getRenderer() const;
