@@ -10,7 +10,7 @@ namespace pixee
 	{
 		enum class EventType {
 			None = 0,
-			KeyPressed, KeyReleased,
+			KeyPressed, KeyReleased, KeyDown,
 			ButtonPressed, ButtonReleased
 		};
 

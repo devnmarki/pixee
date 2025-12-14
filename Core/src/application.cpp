@@ -89,9 +89,19 @@ namespace pixee
 					{
 						SDL_Keycode key = event.key.keysym.sym;
 						heldKeys.erase(key);
+
+						event::KeyReleasedEvent keyReleased(key);
+						m_Window->raiseEvent(keyReleased);
+
 						break;
 					}
 					}
+				}
+
+				for (auto& key : heldKeys)
+				{
+					event::KeyDownEvent keyDown(key);
+					m_Window->raiseEvent(keyDown);
 				}
 
 				for (const auto& layer : m_LayerStack)

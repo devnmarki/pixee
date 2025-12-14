@@ -34,6 +34,32 @@ namespace pixee
 
 			EVENT_CLASS_TYPE(KeyPressed)
 		};
+
+		class KeyReleasedEvent : public KeyEvent
+		{
+		public:
+			KeyReleasedEvent(SDL_Keycode keyCode) : KeyEvent(keyCode) { }
+
+			std::string toString() const override
+			{
+				return std::format("KeyReleasedEvent: {}", m_KeyCode);
+			}
+
+			EVENT_CLASS_TYPE(KeyReleased)
+		};
+
+		class KeyDownEvent : public KeyEvent
+		{
+		public:
+			KeyDownEvent(SDL_Keycode keyCode) : KeyEvent(keyCode) { }
+
+			std::string toString() const override
+			{
+				return std::format("KeyDownEvent: {}", m_KeyCode);
+			}
+
+			EVENT_CLASS_TYPE(KeyDown)
+		};
 	}
 }
 

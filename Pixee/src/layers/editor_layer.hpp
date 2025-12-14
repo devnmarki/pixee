@@ -18,6 +18,8 @@ namespace pixee
 
 	private:
 		bool onKeyPressedEvent(event::KeyPressedEvent& e);
+		bool onKeyReleasedEvent(event::KeyReleasedEvent& e);
+		bool onKeyDownEvent(event::KeyDownEvent& e);
 	};
 }
 
