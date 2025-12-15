@@ -6,6 +6,7 @@
 #include <vec2.hpp>
 
 #include "core.hpp"
+#include "utils.hpp"
 #include "canvas/canvas.hpp"
 
 namespace pixee
@@ -20,7 +21,11 @@ namespace pixee
 
 	private:
 		bool onMousePress(event::MouseButtonPressedEvent& e);
+		bool onMouseDown(event::MouseButtonDownEvent& e);
 		bool onMouseMoved(event::MouseMovedEvent& e);
+
+		void placePixel(const glm::ivec2& pixelPos, uint32_t color);
+		void erasePixel(const glm::ivec2& pixelPos);
 
 	private:
 		std::unique_ptr<Canvas> m_Canvas;

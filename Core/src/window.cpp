@@ -38,7 +38,7 @@ namespace pixee
 
 		void Window::beginFrame() const
 		{
-			SDL_SetRenderDrawColor(m_Renderer, 0, 0, 0, 255);
+			SDL_SetRenderDrawColor(m_Renderer, 20, 20, 20, 255);
 			SDL_RenderClear(m_Renderer);
 		}
 

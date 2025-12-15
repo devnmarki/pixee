@@ -7,12 +7,13 @@ namespace pixee
 		m_Width(width), 
 		m_Height(height), 
 		m_Position(0, 0),
-		m_PixelBuffer(m_Width * m_Height, 0xFFFFFFFF), 
+		m_BackgroundColor(0xFF000000),
+		m_PixelBuffer(m_Width * m_Height, m_BackgroundColor), 
 		m_Zoom(8)
 	{
 		m_PixelsTexture = SDL_CreateTexture(
 			core::Application::getInstance().getRenderer(), 
-			SDL_PIXELFORMAT_RGBA8888, 
+			SDL_PIXELFORMAT_ARGB8888, 
 			SDL_TEXTUREACCESS_STREAMING, 
 			m_Width, 
 			m_Height
@@ -52,6 +53,16 @@ namespace pixee
 		m_PixelBuffer[position.y * m_Width + position.x] = color;
 	}
 
+	bool Canvas::pixelWithSameColor(const glm::ivec2& position, uint32_t color)
+	{
+		return m_PixelBuffer[position.y * m_Width + position.x] == color;
+	}
+
+	uint32_t Canvas::getPixel(const glm::ivec2& position)
+	{
+		return m_PixelBuffer[position.y * m_Width + position.x];
+	}
+
 	bool Canvas::mouseToCanvasPosition(const glm::dvec2& position, glm::ivec2& out) const
 	{
 		int canvasW = m_Width * m_Zoom;
@@ -70,5 +81,9 @@ namespace pixee
 		out.y = localY / m_Zoom;
 
 		return true;
+	}
+	uint32_t Canvas::getBackgroundColor() const
+	{
+		return m_BackgroundColor;
 	}
 }
