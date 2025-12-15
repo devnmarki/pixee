@@ -20,6 +20,10 @@ namespace pixee
 		bool onKeyPressedEvent(event::KeyPressedEvent& e);
 		bool onKeyReleasedEvent(event::KeyReleasedEvent& e);
 		bool onKeyDownEvent(event::KeyDownEvent& e);
+
+		bool onMouseButtonPressedEvent(event::MouseButtonPressedEvent& e);
+		bool onMouseButtonReleasedEvent(event::MouseButtonReleasedEvent& e);
+		bool onMouseButtonDownEvent(event::MouseButtonDownEvent& e);
 	};
 }
 

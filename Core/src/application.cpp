@@ -45,6 +45,7 @@ namespace pixee
 			float deltaTime = 0.0f;
 
 			std::unordered_set<SDL_Keycode> heldKeys;
+			std::unordered_set<event::MouseButton> heldButtons;
 
 			while (m_IsRunning)
 			{
@@ -82,6 +83,7 @@ namespace pixee
 
 						if (key == SDLK_ESCAPE)
 							quit();
+
 						break;
 					}
 					
@@ -95,6 +97,28 @@ namespace pixee
 
 						break;
 					}
+
+					case SDL_MOUSEBUTTONDOWN:
+					{
+						event::MouseButton button = static_cast<event::MouseButton>(event.button.button);
+						heldButtons.insert(button);
+
+						event::MouseButtonPressedEvent mouseButtonPressed(button);
+						m_Window->raiseEvent(mouseButtonPressed);
+						
+						break;
+					}
+
+					case SDL_MOUSEBUTTONUP:
+					{
+						event::MouseButton button = static_cast<event::MouseButton>(event.button.button);
+						heldButtons.erase(button);
+
+						event::MouseButtonReleasedEvent mouseReleasedEvent(button);
+						m_Window->raiseEvent(mouseReleasedEvent);
+
+						break;
+					}
 					}
 				}
 
@@ -102,6 +126,12 @@ namespace pixee
 				{
 					event::KeyDownEvent keyDown(key);
 					m_Window->raiseEvent(keyDown);
+				}
+
+				for (auto& button : heldButtons)
+				{
+					event::MouseButtonDownEvent mouseButtonDown(button);
+					m_Window->raiseEvent(mouseButtonDown);
 				}
 
 				for (const auto& layer : m_LayerStack)

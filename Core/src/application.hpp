@@ -7,11 +7,13 @@
 #include <cassert>
 #include <ranges>
 #include <unordered_set>
+#include <print>
 
 #include "window.hpp"
 #include "layer.hpp"
 #include "utils.hpp"
 #include "event/key_events.hpp"
+#include "event/mouse_events.hpp"
 
 namespace pixee
 {
