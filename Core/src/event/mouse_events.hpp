@@ -20,6 +20,31 @@ namespace pixee
 			X2 = SDL_BUTTON_X2
 		};
 
+		class MouseMovedEvent : public Event
+		{
+		public:
+			MouseMovedEvent(double x, double y, double dx, double dy) : m_X(x), m_Y(y), m_DeltaX(dx), m_DeltaY(dy) { }
+
+			double getX() const { return m_X; }
+			double getY() const { return m_Y; }
+			double getDeltaX() const { return m_DeltaX; }
+			double getDeltaY() const { return m_DeltaY; }
+
+			std::string toString() const override
+			{
+				return std::format("MouseMovedEvent: X: {}, Y: {}, DeltaX: {}, DeltaY: {}", m_X, m_Y, m_DeltaX, m_DeltaY);
+			}
+
+			EVENT_CLASS_TYPE(MouseMoved)
+
+		private:
+			double m_X;
+			double m_Y;
+
+			double m_DeltaX;
+			double m_DeltaY;
+		};
+
 		class MouseButtonEvent : public Event
 		{
 		public:

@@ -119,6 +119,19 @@ namespace pixee
 
 						break;
 					}
+
+					case SDL_MOUSEMOTION:
+					{
+						double mx = static_cast<double>(event.motion.x);
+						double my = static_cast<double>(event.motion.y);
+						double mdx = static_cast<double>(event.motion.xrel);
+						double mdy = static_cast<double>(event.motion.yrel);
+
+						event::MouseMovedEvent mouseMoved(mx, my, mdx, mdy);
+						m_Window->raiseEvent(mouseMoved);
+
+						break;
+					}
 					}
 				}
 

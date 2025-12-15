@@ -24,6 +24,7 @@ namespace pixee
 		bool onMouseButtonPressedEvent(event::MouseButtonPressedEvent& e);
 		bool onMouseButtonReleasedEvent(event::MouseButtonReleasedEvent& e);
 		bool onMouseButtonDownEvent(event::MouseButtonDownEvent& e);
+		bool onMouseMovedEvent(event::MouseMovedEvent& e);
 	};
 }
 
