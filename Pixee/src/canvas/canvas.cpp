@@ -3,7 +3,12 @@
 namespace pixee
 {
 	Canvas::Canvas(int width, int height)
-		: m_Width(width), m_Height(height), m_PixelBuffer(m_Width * m_Height, 0xFF000000)
+		: 
+		m_Width(width), 
+		m_Height(height), 
+		m_Position(0, 0),
+		m_PixelBuffer(m_Width * m_Height, 0xFFFFFFFF), 
+		m_Zoom(8)
 	{
 		m_PixelsTexture = SDL_CreateTexture(
 			core::Application::getInstance().getRenderer(), 
@@ -12,6 +17,11 @@ namespace pixee
 			m_Width, 
 			m_Height
 		);
+	}
+
+	Canvas::~Canvas()
+	{
+		SDL_DestroyTexture(m_PixelsTexture);
 	}
 
 	void Canvas::upload()
@@ -30,7 +40,35 @@ namespace pixee
 
 		upload();
 
-		SDL_Rect dst = { 0, 0, m_Width * 8, m_Height * 8 };
+		SDL_Rect dst = { m_Position.x, m_Position.y, m_Width * m_Zoom, m_Height * m_Zoom };
 		SDL_RenderCopy(renderer, m_PixelsTexture, nullptr, &dst);
+	}
+
+	void Canvas::setPixel(const glm::ivec2& position, uint32_t color)
+	{
+		if (position.x < 0 || position.y < 0 || position.x >= m_Width || position.y >= m_Height)
+			return;
+
+		m_PixelBuffer[position.y * m_Width + position.x] = color;
+	}
+
+	bool Canvas::mouseToCanvasPosition(const glm::dvec2& position, glm::ivec2& out) const
+	{
+		int canvasW = m_Width * m_Zoom;
+		int canvasH = m_Height * m_Zoom;
+
+		if (position.x < m_Position.x || position.y < m_Position.y)
+			return false;
+
+		if (position.x >= m_Position.x + canvasW || position.y >= m_Position.y + canvasH)
+			return false;
+
+		int localX = static_cast<int>(position.x) - m_Position.x;
+		int localY = static_cast<int>(position.y) - m_Position.y;
+
+		out.x = localX / m_Zoom;
+		out.y = localY / m_Zoom;
+
+		return true;
 	}
 }

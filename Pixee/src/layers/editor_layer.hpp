@@ -3,8 +3,9 @@
 
 #include <print>
 
-#include "core.hpp"
+#include <vec2.hpp>
 
+#include "core.hpp"
 #include "canvas/canvas.hpp"
 
 namespace pixee
@@ -18,17 +19,13 @@ namespace pixee
 		void onEvent(event::Event& event) override;
 
 	private:
-		//bool onKeyPressedEvent(event::KeyPressedEvent& e);
-		//bool onKeyReleasedEvent(event::KeyReleasedEvent& e);
-		//bool onKeyDownEvent(event::KeyDownEvent& e);
-
-		//bool onMouseButtonPressedEvent(event::MouseButtonPressedEvent& e);
-		//bool onMouseButtonReleasedEvent(event::MouseButtonReleasedEvent& e);
-		//bool onMouseButtonDownEvent(event::MouseButtonDownEvent& e);
-		//bool onMouseMovedEvent(event::MouseMovedEvent& e);
+		bool onMousePress(event::MouseButtonPressedEvent& e);
+		bool onMouseMoved(event::MouseMovedEvent& e);
 
 	private:
-		Canvas m_Canvas;
+		std::unique_ptr<Canvas> m_Canvas;
+
+		glm::dvec2 m_MousePosition;
 	};
 }
 

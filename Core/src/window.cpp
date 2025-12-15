@@ -12,8 +12,11 @@ namespace pixee
 
 		Window::~Window()
 		{
-			SDL_DestroyWindow(m_Handle);
-			SDL_DestroyRenderer(m_Renderer);
+			if (m_Renderer) 
+				SDL_DestroyRenderer(m_Renderer);
+			
+			if (m_Handle)
+				SDL_DestroyWindow(m_Handle);
 		}
 
 		void Window::create()

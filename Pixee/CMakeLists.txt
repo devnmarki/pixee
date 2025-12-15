@@ -15,6 +15,7 @@ target_include_directories(
 	Pixee PRIVATE 
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 	${CMAKE_SOURCE_DIR}/vendor/SDL2/include
+	${CMAKE_SOURCE_DIR}/vendor/glm/glm
 )
 
 target_link_libraries(Pixee  

@@ -8,6 +8,7 @@ endif()
 project(Pixee)
 
 add_subdirectory(vendor/SDL2)
+add_subdirectory(vendor/glm)
 
 add_subdirectory(Core)
 add_subdirectory(Pixee)
