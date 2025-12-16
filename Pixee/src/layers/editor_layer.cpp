@@ -11,6 +11,20 @@ namespace pixee
 		m_Canvas = std::make_unique<Canvas>(64, 64, canvasPosition);
 	}
 
+	void EditorLayer::onUpdate()
+	{
+		if (!m_IsDrawing) 
+			return;
+
+		glm::ivec2 newPixelPos;
+		constexpr uint32_t newPixelColor = utils::ARGB(255, 0, 0, 255);
+
+		if (!m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos))
+			return;
+
+		placePixel(newPixelPos, newPixelColor);
+	}
+
 	void EditorLayer::onRender()
 	{
 		m_Canvas->render();
@@ -20,6 +34,7 @@ namespace pixee
 	{
 		event::EventDispatcher dispatcher(event);
 		dispatcher.dispatch<event::MouseButtonPressedEvent>([this](event::MouseButtonPressedEvent& e) { return onMousePress(e); });
+		dispatcher.dispatch<event::MouseButtonReleasedEvent>([this](event::MouseButtonReleasedEvent& e) { return onMouseReleased(e); });
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
 	}
@@ -29,15 +44,21 @@ namespace pixee
 		return false;
 	}
 
+	bool EditorLayer::onMouseReleased(event::MouseButtonReleasedEvent& e)
+	{
+		if (e.getButton() == event::MouseButton::Left)
+			m_IsDrawing = false;
+
+		return false;
+	}
+
 	bool EditorLayer::onMouseDown(event::MouseButtonDownEvent& e)
 	{
 		glm::ivec2 newPixelPos;
-		constexpr uint32_t newPixelColor = utils::ARGB(255, 0, 0, 255);
-
 		bool inCanvas = m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos);
 
-		if (e.getButton() == event::MouseButton::Left && inCanvas)
-			placePixel(newPixelPos, newPixelColor);
+		if (e.getButton() == event::MouseButton::Left)
+			m_IsDrawing = true;
 
 		if (e.getButton() == event::MouseButton::Right && inCanvas)
 			erasePixel(newPixelPos);

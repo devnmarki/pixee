@@ -16,11 +16,13 @@ namespace pixee
 	public:
 		EditorLayer();
 
+		void onUpdate() override;
 		void onRender() override;
 		void onEvent(event::Event& event) override;
 
 	private:
 		bool onMousePress(event::MouseButtonPressedEvent& e);
+		bool onMouseReleased(event::MouseButtonReleasedEvent& e);
 		bool onMouseDown(event::MouseButtonDownEvent& e);
 		bool onMouseMoved(event::MouseMovedEvent& e);
 
@@ -31,6 +33,7 @@ namespace pixee
 		std::unique_ptr<Canvas> m_Canvas;
 
 		glm::dvec2 m_MousePosition;
+		bool m_IsDrawing = false;
 	};
 }
 
