@@ -62,5 +62,15 @@ namespace pixee
 		{
 			return m_Renderer;
 		}
+
+		int Window::getWidth() const
+		{
+			return m_Specs.width;
+		}
+
+		int Window::getHeight() const
+		{
+			return m_Specs.height;
+		}
 	}
 }

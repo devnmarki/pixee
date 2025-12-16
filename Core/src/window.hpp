@@ -38,6 +38,8 @@ namespace pixee
 
 			SDL_Window* getHandle() const;
 			SDL_Renderer* getRenderer() const;
+			int getWidth() const;
+			int getHeight() const;
 
 		private:
 			WindowSpecification m_Specs;

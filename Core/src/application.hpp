@@ -64,6 +64,18 @@ namespace pixee
 			LayerStack& getLayerStack();
 
 		private:
+			void handleEvents(SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys, std::unordered_set<event::MouseButton>& heldButtons);
+			
+			void handleKeyPressedEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys);
+			void handleKeyReleasedEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys);
+			void handleKeyDownEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys);
+			
+			void handleButtonPressedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
+			void handleButtonReleasedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
+			void handleButtonDownEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
+			void handleMouseMovedEvent(const SDL_Event& e);
+
+		private:
 			ApplicationSpecification m_Specs;
 			std::shared_ptr<Window> m_Window;
 			bool m_IsRunning;

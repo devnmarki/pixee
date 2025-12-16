@@ -3,8 +3,12 @@
 namespace pixee
 {
 	EditorLayer::EditorLayer()
+		: m_MousePosition(0, 0)
 	{
-		m_Canvas = std::make_unique<Canvas>(64, 64);
+		glm::vec2 canvasPosition;
+		canvasPosition.x = core::Application::getInstance().getWindow()->getWidth() / 2 - 32 * 8;
+		canvasPosition.y = core::Application::getInstance().getWindow()->getHeight() / 2 - 32 * 8;
+		m_Canvas = std::make_unique<Canvas>(64, 64, canvasPosition);
 	}
 
 	void EditorLayer::onRender()
@@ -66,6 +70,6 @@ namespace pixee
 
 		std::println("Pixel erased at position X: {}, Y: {}", pixelPos.x, pixelPos.y);
 
-		m_Canvas->setPixel(pixelPos, m_Canvas->getBackgroundColor());
+		m_Canvas->setPixel(pixelPos, m_Canvas->getBackgroundColor()); 
 	}
 }

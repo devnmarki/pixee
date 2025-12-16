@@ -47,6 +47,8 @@ namespace pixee
 			std::unordered_set<SDL_Keycode> heldKeys;
 			std::unordered_set<event::MouseButton> heldButtons;
 
+			SDL_Event event;
+
 			while (m_IsRunning)
 			{
 				frameStart = SDL_GetTicks();
@@ -60,92 +62,13 @@ namespace pixee
 
 				utils::Time::deltaTime = deltaTime;
 
-				SDL_Event event;
 				if (SDL_PollEvent(&event))
 				{
-					switch (event.type)
-					{
-					case SDL_QUIT:
-						quit();
-						break;
-					
-					case SDL_KEYDOWN:
-					{
-						SDL_Keycode key = event.key.keysym.sym;
-						bool repeat = event.key.repeat;
-
-						if (!repeat)
-						{
-							heldKeys.insert(key);
-							event::KeyPressedEvent keyPressed(key);
-							m_Window->raiseEvent(keyPressed);
-						}
-
-						if (key == SDLK_ESCAPE)
-							quit();
-
-						break;
-					}
-					
-					case SDL_KEYUP:
-					{
-						SDL_Keycode key = event.key.keysym.sym;
-						heldKeys.erase(key);
-
-						event::KeyReleasedEvent keyReleased(key);
-						m_Window->raiseEvent(keyReleased);
-
-						break;
-					}
-
-					case SDL_MOUSEBUTTONDOWN:
-					{
-						event::MouseButton button = static_cast<event::MouseButton>(event.button.button);
-						heldButtons.insert(button);
-
-						event::MouseButtonPressedEvent mouseButtonPressed(button);
-						m_Window->raiseEvent(mouseButtonPressed);
-						
-						break;
-					}
-
-					case SDL_MOUSEBUTTONUP:
-					{
-						event::MouseButton button = static_cast<event::MouseButton>(event.button.button);
-						heldButtons.erase(button);
-
-						event::MouseButtonReleasedEvent mouseReleasedEvent(button);
-						m_Window->raiseEvent(mouseReleasedEvent);
-
-						break;
-					}
-
-					case SDL_MOUSEMOTION:
-					{
-						double mx = static_cast<double>(event.motion.x);
-						double my = static_cast<double>(event.motion.y);
-						double mdx = static_cast<double>(event.motion.xrel);
-						double mdy = static_cast<double>(event.motion.yrel);
-
-						event::MouseMovedEvent mouseMoved(mx, my, mdx, mdy);
-						m_Window->raiseEvent(mouseMoved);
-
-						break;
-					}
-					}
+					handleEvents(event, heldKeys, heldButtons);
 				}
 
-				for (auto& key : heldKeys)
-				{
-					event::KeyDownEvent keyDown(key);
-					m_Window->raiseEvent(keyDown);
-				}
-
-				for (auto& button : heldButtons)
-				{
-					event::MouseButtonDownEvent mouseButtonDown(button);
-					m_Window->raiseEvent(mouseButtonDown);
-				}
+				handleKeyDownEvent(event, heldKeys);
+				handleButtonDownEvent(event, heldButtons);
 
 				for (const auto& layer : m_LayerStack)
 					layer->onUpdate();
@@ -191,6 +114,102 @@ namespace pixee
 		std::vector<std::unique_ptr<Layer>>& Application::getLayerStack()
 		{
 			return m_LayerStack;
+		}
+
+		void Application::handleEvents(SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys, std::unordered_set<event::MouseButton>& heldButtons)
+		{
+			switch (e.type)
+			{
+			case SDL_QUIT:
+				quit();
+				break;
+			case SDL_KEYDOWN:
+				if (e.key.keysym.sym == SDLK_ESCAPE)
+					quit();
+				handleKeyPressedEvent(e, heldKeys);
+				break;
+			case SDL_KEYUP:
+				handleKeyReleasedEvent(e, heldKeys);
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				handleButtonPressedEvent(e, heldButtons);
+				break;
+			case SDL_MOUSEBUTTONUP:
+				handleButtonReleasedEvent(e, heldButtons);
+				break;
+			case SDL_MOUSEMOTION:
+				handleMouseMovedEvent(e);
+				break;
+			}
+		}
+
+		void Application::handleKeyPressedEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys)
+		{
+			SDL_Keycode key = e.key.keysym.sym;
+			bool repeat = e.key.repeat;
+
+			if (!repeat)
+			{
+				heldKeys.insert(key);
+				event::KeyPressedEvent keyPressed(key);
+				m_Window->raiseEvent(keyPressed);
+			}
+		}
+
+		void Application::handleKeyReleasedEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys)
+		{
+			SDL_Keycode key = e.key.keysym.sym;
+			heldKeys.erase(key);
+
+			event::KeyReleasedEvent keyReleased(key);
+			m_Window->raiseEvent(keyReleased);
+		}
+
+		void Application::handleKeyDownEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys)
+		{
+			for (auto& key : heldKeys)
+			{
+				event::KeyDownEvent keyDown(key);
+				m_Window->raiseEvent(keyDown);
+			}
+		}
+
+		void Application::handleButtonPressedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons)
+		{
+			event::MouseButton button = static_cast<event::MouseButton>(e.button.button);
+			heldButtons.insert(button);
+
+			event::MouseButtonPressedEvent mouseButtonPressed(button);
+			m_Window->raiseEvent(mouseButtonPressed);
+		}
+
+		void Application::handleButtonReleasedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons)
+		{
+			event::MouseButton button = static_cast<event::MouseButton>(e.button.button);
+			heldButtons.erase(button);
+
+			event::MouseButtonReleasedEvent mouseReleasedEvent(button);
+			m_Window->raiseEvent(mouseReleasedEvent);
+		}
+
+		void Application::handleButtonDownEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons)
+		{
+			for (auto& button : heldButtons)
+			{
+				event::MouseButtonDownEvent mouseButtonDown(button);
+				m_Window->raiseEvent(mouseButtonDown);
+			}
+		}
+
+		void Application::handleMouseMovedEvent(const SDL_Event& e)
+		{
+			double mx = static_cast<double>(e.motion.x);
+			double my = static_cast<double>(e.motion.y);
+			double mdx = static_cast<double>(e.motion.xrel);
+			double mdy = static_cast<double>(e.motion.yrel);
+
+			event::MouseMovedEvent mouseMoved(mx, my, mdx, mdy);
+			m_Window->raiseEvent(mouseMoved);
 		}
 	}
 }

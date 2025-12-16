@@ -2,11 +2,11 @@
 
 namespace pixee
 {
-	Canvas::Canvas(int width, int height)
+	Canvas::Canvas(int width, int height, const glm::vec2& position)
 		: 
 		m_Width(width), 
 		m_Height(height), 
-		m_Position(0, 0),
+		m_Position(position),
 		m_BackgroundColor(0xFF000000),
 		m_PixelBuffer(m_Width * m_Height, m_BackgroundColor), 
 		m_Zoom(8)

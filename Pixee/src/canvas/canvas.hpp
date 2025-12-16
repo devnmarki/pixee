@@ -13,7 +13,7 @@ namespace pixee
 	class Canvas
 	{
 	public:
-		Canvas(int width, int height);
+		Canvas(int width, int height, const glm::vec2& position = glm::vec2(0, 0));
 		~Canvas();
 
 		void upload();
