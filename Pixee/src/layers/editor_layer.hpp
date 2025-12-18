@@ -2,6 +2,7 @@
 #define EDITORLAYER_HPP
 
 #include <print>
+#include <algorithm>
 
 #include <vec2.hpp>
 
@@ -24,6 +25,8 @@ namespace pixee
 	private:
 		void handleDrawing();
 		void handlePanning(event::MouseMovedEvent& e);
+		void handleCanvasZooming(event::MouseScrolledEvent& e);
+		
 		void drawBackground();
 
 		bool onKeyDown(event::KeyDownEvent& e);
@@ -33,12 +36,13 @@ namespace pixee
 		bool onMouseReleased(event::MouseButtonReleasedEvent& e);
 		bool onMouseDown(event::MouseButtonDownEvent& e);
 		bool onMouseMoved(event::MouseMovedEvent& e);
+		bool onMouseScroll(event::MouseScrolledEvent& e);
 
 		void placePixel(const glm::ivec2& pixelPos, uint32_t color);
 		void erasePixel(const glm::ivec2& pixelPos);
 
 	private:
-		std::unique_ptr<Canvas> m_Canvas;
+		std::shared_ptr<Canvas> m_Canvas;
 		glm::vec2 m_CanvasPosition{0, 0};
 		std::shared_ptr<gfx::CheckerTexture> m_CheckerTextureBG;
 

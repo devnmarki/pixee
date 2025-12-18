@@ -140,6 +140,9 @@ namespace pixee
 			case SDL_MOUSEMOTION:
 				handleMouseMovedEvent(e);
 				break;
+			case SDL_MOUSEWHEEL:
+				handleMouseScrolledEvent(e);
+				break;
 			}
 		}
 
@@ -210,6 +213,16 @@ namespace pixee
 
 			event::MouseMovedEvent mouseMoved(mx, my, mdx, mdy);
 			m_Window->raiseEvent(mouseMoved);
+		}
+
+		void Application::handleMouseScrolledEvent(const SDL_Event& e)
+		{
+			int32_t x = e.wheel.x;
+			int32_t y = e.wheel.y;
+			uint32_t direction = e.wheel.direction;
+
+			event::MouseScrolledEvent mouseScrolled(x, y, direction);
+			m_Window->raiseEvent(mouseScrolled);
 		}
 	}
 }

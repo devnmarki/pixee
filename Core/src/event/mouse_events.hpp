@@ -45,6 +45,28 @@ namespace pixee
 			double m_DeltaY;
 		};
 
+		class MouseScrolledEvent : public Event
+		{
+		public:
+			MouseScrolledEvent(int32_t x, int32_t y, uint32_t direction) : m_X(x), m_Y(y), m_Direction(direction) { }
+
+			int32_t getX() const { return m_X; }
+			int32_t getY() const { return m_Y; }
+			uint32_t getDirection() const { return m_Direction; }
+
+			std::string toString() const override
+			{
+				return std::format("MouseScrolledEvent: X: {}, y: {}", m_X, m_Y);
+			}
+
+			EVENT_CLASS_TYPE(MouseScrolled)
+
+		private:
+			int32_t m_X;
+			int32_t m_Y;
+			uint32_t m_Direction;
+		};
+
 		class MouseButtonEvent : public Event
 		{
 		public:

@@ -6,7 +6,7 @@ namespace pixee
 	{
 		m_CanvasPosition.x = static_cast<float>(core::Application::getInstance().getWindow()->getWidth() / 2 - 32 * 8);
 		m_CanvasPosition.y = static_cast<float>(core::Application::getInstance().getWindow()->getHeight() / 2 - 32 * 8);
-		m_Canvas = std::make_unique<Canvas>(64, 64, m_CanvasPosition);
+		m_Canvas = std::make_shared<Canvas>(64, 64, m_CanvasPosition);
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
 	}
@@ -35,6 +35,7 @@ namespace pixee
 		dispatcher.dispatch<event::MouseButtonReleasedEvent>([this](event::MouseButtonReleasedEvent& e) { return onMouseReleased(e); });
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
+		dispatcher.dispatch<event::MouseScrolledEvent>([this](event::MouseScrolledEvent& e) { return onMouseScroll(e); });
 	}
 
 	void EditorLayer::handleDrawing()
@@ -72,6 +73,25 @@ namespace pixee
 		m_MousePosition = currentMousePos;
 	}
 
+	void EditorLayer::handleCanvasZooming(event::MouseScrolledEvent& e)
+	{
+		float oldZoom = static_cast<float>(m_Canvas->getZoom());
+		float newZoom = static_cast<float>(std::clamp(m_Canvas->getZoom() + e.getY(), 1, 15));
+
+		if (oldZoom == newZoom)
+			return;
+
+		glm::vec2 before = (glm::vec2(m_MousePosition) - m_Canvas->getPosition()) / oldZoom;
+
+		m_Canvas->setZoom(newZoom);
+
+		glm::vec2 after = (glm::vec2(m_MousePosition) - m_Canvas->getPosition()) / newZoom;
+		glm::vec2 delta = (after - before) * newZoom;
+
+		m_CanvasPosition += delta;
+		m_Canvas->setPosition(m_CanvasPosition);
+	}
+
 	void EditorLayer::drawBackground()
 	{
 		SDL_Renderer* r = core::Application::getInstance().getRenderer();
@@ -97,7 +117,6 @@ namespace pixee
 
 	bool EditorLayer::onKeyReleased(event::KeyReleasedEvent& e)
 	{
-
 		return false;
 	}
 
@@ -157,6 +176,13 @@ namespace pixee
 		m_MouseDelta.y = e.getDeltaY();
 
 		handlePanning(e);
+
+		return false;
+	}
+
+	bool EditorLayer::onMouseScroll(event::MouseScrolledEvent& e)
+	{
+		handleCanvasZooming(e);
 
 		return false;
 	}

@@ -74,6 +74,7 @@ namespace pixee
 			void handleButtonReleasedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
 			void handleButtonDownEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
 			void handleMouseMovedEvent(const SDL_Event& e);
+			void handleMouseScrolledEvent(const SDL_Event& e);
 
 		private:
 			ApplicationSpecification m_Specs;
