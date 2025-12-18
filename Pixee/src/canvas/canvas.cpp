@@ -53,7 +53,7 @@ namespace pixee
 		m_PixelBuffer[position.y * m_Width + position.x] = color;
 	}
 
-	bool Canvas::pixelWithSameColor(const glm::ivec2& position, uint32_t color)
+	bool Canvas::pixelAlreadyExists(const glm::ivec2& position, uint32_t color)
 	{
 		return m_PixelBuffer[position.y * m_Width + position.x] == color;
 	}
@@ -82,6 +82,27 @@ namespace pixee
 
 		return true;
 	}
+
+	void Canvas::setPosition(const glm::vec2& position)
+	{
+		m_Position = position;
+	}
+
+	int Canvas::getWidth() const
+	{
+		return m_Width;
+	}
+
+	int Canvas::getHeight() const
+	{
+		return m_Height;
+	}
+
+	glm::vec2 Canvas::getPosition()
+	{
+		return m_Position;
+	}
+
 	uint32_t Canvas::getBackgroundColor() const
 	{
 		return m_BackgroundColor;
