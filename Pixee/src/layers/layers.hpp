@@ -2,5 +2,6 @@
 #define LAYERS_HPP
 
 #include "editor_layer.hpp"
+#include "ui_layer.hpp"
 
 #endif

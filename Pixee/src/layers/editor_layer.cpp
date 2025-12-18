@@ -44,7 +44,17 @@ namespace pixee
 			return;
 
 		glm::ivec2 newPixelPos;
-		constexpr uint32_t newPixelColor = utils::ARGB(255, 0, 0, 255);
+
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+		ui::ColorPickerPanel& colorPicker = uiLayer->getColorPickerPanel();
+		glm::vec4 newColor = colorPicker.getSelectedColor();
+
+		const uint32_t newPixelColor = utils::ARGB(
+			static_cast<uint32_t>(newColor.r * 255),
+			static_cast<uint32_t>(newColor.g * 255),
+			static_cast<uint32_t>(newColor.b * 255),
+			static_cast<uint32_t>(newColor.a * 255)
+		);
 
 		if (!m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos))
 			return;
@@ -160,7 +170,10 @@ namespace pixee
 		bool inCanvas = m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos);
 
 		if (e.getButton() == event::MouseButton::Left)
+		{
 			m_IsDrawing = true;
+			return true;
+		}
 
 		if (e.getButton() == event::MouseButton::Right && inCanvas)
 			erasePixel(newPixelPos);

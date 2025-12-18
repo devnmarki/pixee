@@ -10,6 +10,7 @@
 #include "utils.hpp"
 #include "canvas/canvas.hpp"
 #include "graphics/checker_texture.hpp"
+#include "layers/ui_layer.hpp"
 
 namespace pixee
 {

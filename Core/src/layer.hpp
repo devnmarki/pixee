@@ -18,6 +18,7 @@ namespace pixee
 			virtual void onUpdate() {}
 			virtual void onRender() {}
 			virtual void onEvent(event::Event& event) {}
+			virtual void onGuiRender() {}
 
 			template<typename T, typename... Args>
 			void transitionTo(Args&&... args)

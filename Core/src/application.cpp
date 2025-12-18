@@ -114,15 +114,9 @@ namespace pixee
 				ImGui::End();
 
 				m_Window->beginFrame();
-				
-				ImGui::Begin("Hello, World!");
-				ImGui::Text("This is some useful text.");
-				if (ImGui::Button("Click Me")) {
 
-				}
-				ImGui::End();
-
-				//ImGui::ShowDemoWindow();
+				for (const auto& layer : m_LayerStack)
+					layer->onGuiRender();
 
 				ImGui::Render();
 
