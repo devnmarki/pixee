@@ -16,6 +16,7 @@ target_include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/src
 	${CMAKE_SOURCE_DIR}/vendor/SDL2/include
 	${CMAKE_SOURCE_DIR}/vendor/glm/glm
+	${CMAKE_SOURCE_DIR}/vendor/imgui
 )
 
 target_link_libraries(Pixee  
@@ -23,6 +24,7 @@ target_link_libraries(Pixee
 	Core
 	SDL2
 	SDL2main
+	imgui
 )
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

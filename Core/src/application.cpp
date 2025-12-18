@@ -18,6 +18,8 @@ namespace pixee
 
 			m_Window = std::make_shared<Window>(m_Specs.windowSpecs);
 			m_Window->create();
+
+			IMGUI_CHECKVERSION();
 		}
 
 		Application::~Application()
