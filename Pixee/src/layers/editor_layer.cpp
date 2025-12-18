@@ -43,7 +43,11 @@ namespace pixee
 		if (!m_IsDrawing)
 			return;
 
-		glm::ivec2 newPixelPos;
+		glm::ivec2 currentPixelPos;
+
+		// Convert mouse position to canvas coordinates
+		if (!m_Canvas->mouseToCanvasPosition(m_MousePosition, currentPixelPos))
+			return;
 
 		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
 		ui::ColorPickerPanel& colorPicker = uiLayer->getColorPickerPanel();
@@ -56,10 +60,23 @@ namespace pixee
 			static_cast<uint32_t>(newColor.a * 255)
 		);
 
-		if (!m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos))
-			return;
-
-		placePixel(newPixelPos, newPixelColor);
+		if (m_FirstClick)
+		{
+			placePixel(currentPixelPos, newPixelColor);
+			m_LastCanvasPixelPos = currentPixelPos;
+			m_FirstClick = false;
+		}
+		else
+		{
+			drawLine(
+				m_LastCanvasPixelPos.x,
+				m_LastCanvasPixelPos.y,
+				currentPixelPos.x,
+				currentPixelPos.y,
+				newPixelColor
+			);
+			m_LastCanvasPixelPos = currentPixelPos;
+		}
 	}
 
 	void EditorLayer::handlePanning(event::MouseMovedEvent& e)
@@ -120,6 +137,32 @@ namespace pixee
 		SDL_RenderSetClipRect(r, nullptr);
 	}
 
+	void EditorLayer::drawLine(int x0, int y0, int x1, int y1, uint32_t color)
+	{
+		int dx = std::abs(x1 - x0);
+		int dy = -std::abs(y1 - y0);
+		int sx = x0 < x1 ? 1 : -1;
+		int sy = y0 < y1 ? 1 : -1;
+		int err = dx + dy;
+
+		while (true) {
+			// Draw the pixel at the current coordinates
+			placePixel(glm::ivec2(x0, y0), color);
+
+			if (x0 == x1 && y0 == y1) break;
+
+			int e2 = 2 * err;
+			if (e2 >= dy) {
+				err += dy;
+				x0 += sx;
+			}
+			if (e2 <= dx) {
+				err += dx;
+				y0 += sy;
+			}
+		}
+	}
+
 	bool EditorLayer::onKeyDown(event::KeyDownEvent& e)
 	{
 		return false;
@@ -149,7 +192,10 @@ namespace pixee
 	bool EditorLayer::onMouseReleased(event::MouseButtonReleasedEvent& e)
 	{
 		if (e.getButton() == event::MouseButton::Left)
+		{
 			m_IsDrawing = false;
+			m_FirstClick = true;
+		}
 
 		if (e.getButton() == event::MouseButton::Middle && m_IsPanning)
 		{
