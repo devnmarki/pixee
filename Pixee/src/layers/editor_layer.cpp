@@ -3,11 +3,12 @@
 namespace pixee
 {
 	EditorLayer::EditorLayer()
-		: m_MousePosition(0), m_MouseDelta(0)
 	{
 		m_CanvasPosition.x = static_cast<float>(core::Application::getInstance().getWindow()->getWidth() / 2 - 32 * 8);
 		m_CanvasPosition.y = static_cast<float>(core::Application::getInstance().getWindow()->getHeight() / 2 - 32 * 8);
 		m_Canvas = std::make_unique<Canvas>(64, 64, m_CanvasPosition);
+
+		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
 	}
 
 	void EditorLayer::onUpdate()
@@ -15,11 +16,12 @@ namespace pixee
 		if (m_IsPanning)
 			m_IsDrawing = false;
 
-		placePixels();
+		handleDrawing();
 	}
 
 	void EditorLayer::onRender()
 	{
+		drawBackground();
 		m_Canvas->render();
 	}
 
@@ -35,7 +37,7 @@ namespace pixee
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
 	}
 
-	void EditorLayer::placePixels()
+	void EditorLayer::handleDrawing()
 	{
 		if (!m_IsDrawing)
 			return;
@@ -49,10 +51,47 @@ namespace pixee
 		placePixel(newPixelPos, newPixelColor);
 	}
 
+	void EditorLayer::handlePanning(event::MouseMovedEvent& e)
+	{
+		glm::vec2 currentMousePos;
+		currentMousePos.x = static_cast<float>(e.getX());
+		currentMousePos.y = static_cast<float>(e.getY());
+
+		if (m_IsPanning)
+		{
+			float deltaX = currentMousePos.x - m_LastMousePosition.x;
+			float deltaY = currentMousePos.y - m_LastMousePosition.y;
+
+			m_CanvasPosition.x += deltaX;
+			m_CanvasPosition.y += deltaY;
+
+			m_Canvas->setPosition(m_CanvasPosition);
+		}
+
+		m_LastMousePosition = m_MousePosition;
+		m_MousePosition = currentMousePos;
+	}
+
+	void EditorLayer::drawBackground()
+	{
+		SDL_Renderer* r = core::Application::getInstance().getRenderer();
+		int w, h;
+		SDL_GetRendererOutputSize(r, &w, &h);
+
+		SDL_Rect clipRect = {
+			.x = static_cast<int>(m_Canvas->getPosition().x),
+			.y = static_cast<int>(m_Canvas->getPosition().y),
+			.w = m_Canvas->getWidth() * m_Canvas->getZoom(),
+			.h = m_Canvas->getHeight() * m_Canvas->getZoom()
+		};
+
+		SDL_RenderSetClipRect(r, &clipRect);
+		m_CheckerTextureBG->draw(glm::vec2(0, 0), w, h);
+		SDL_RenderSetClipRect(r, nullptr);
+	}
+
 	bool EditorLayer::onKeyDown(event::KeyDownEvent& e)
 	{
-		//std::println("Key Pressed: {}", e.getKeyCode());
-
 		return false;
 	}
 
@@ -117,23 +156,7 @@ namespace pixee
 		m_MouseDelta.x = e.getDeltaX();
 		m_MouseDelta.y = e.getDeltaY();
 
-		glm::vec2 currentMousePos;
-		currentMousePos.x = static_cast<float>(e.getX());
-		currentMousePos.y = static_cast<float>(e.getY());
-
-		if (m_IsPanning)
-		{
-			float deltaX = currentMousePos.x - m_LastMousePosition.x;
-			float deltaY = currentMousePos.y - m_LastMousePosition.y;
-
-			m_CanvasPosition.x += deltaX;
-			m_CanvasPosition.y += deltaY;
-
-			m_Canvas->setPosition(m_CanvasPosition);
-		}
-
-		m_LastMousePosition = m_MousePosition;
-		m_MousePosition = currentMousePos;
+		handlePanning(e);
 
 		return false;
 	}

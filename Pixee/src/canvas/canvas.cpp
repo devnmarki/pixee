@@ -7,7 +7,7 @@ namespace pixee
 		m_Width(width), 
 		m_Height(height), 
 		m_Position(position),
-		m_BackgroundColor(0xFF000000),
+		m_BackgroundColor(0x00000000),
 		m_PixelBuffer(m_Width * m_Height, m_BackgroundColor), 
 		m_Zoom(8)
 	{
@@ -18,6 +18,8 @@ namespace pixee
 			m_Width, 
 			m_Height
 		);
+
+		SDL_SetTextureBlendMode(m_PixelsTexture, SDL_BLENDMODE_BLEND);
 	}
 
 	Canvas::~Canvas()
@@ -88,6 +90,11 @@ namespace pixee
 		m_Position = position;
 	}
 
+	void Canvas::setZoom(int zoom)
+	{
+		m_Zoom = zoom;
+	}
+
 	int Canvas::getWidth() const
 	{
 		return m_Width;
@@ -106,5 +113,15 @@ namespace pixee
 	uint32_t Canvas::getBackgroundColor() const
 	{
 		return m_BackgroundColor;
+	}
+
+	int Canvas::getZoom() const
+	{
+		return m_Zoom;
+	}
+
+	SDL_Texture* Canvas::getCanvasTexture()
+	{
+		return m_PixelsTexture;
 	}
 }

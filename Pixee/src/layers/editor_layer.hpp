@@ -8,6 +8,7 @@
 #include "core.hpp"
 #include "utils.hpp"
 #include "canvas/canvas.hpp"
+#include "graphics/checker_texture.hpp"
 
 namespace pixee
 {
@@ -21,7 +22,9 @@ namespace pixee
 		void onEvent(event::Event& event) override;
 
 	private:
-		void placePixels();
+		void handleDrawing();
+		void handlePanning(event::MouseMovedEvent& e);
+		void drawBackground();
 
 		bool onKeyDown(event::KeyDownEvent& e);
 		bool onKeyReleased(event::KeyReleasedEvent& e);
@@ -36,15 +39,16 @@ namespace pixee
 
 	private:
 		std::unique_ptr<Canvas> m_Canvas;
-		glm::vec2 m_CanvasPosition;
+		glm::vec2 m_CanvasPosition{0, 0};
+		std::shared_ptr<gfx::CheckerTexture> m_CheckerTextureBG;
 
-		glm::dvec2 m_MousePosition;
+		glm::dvec2 m_MousePosition{0, 0};
 		bool m_IsDrawing = false;
 
-		glm::dvec2 m_MouseDelta;
+		glm::dvec2 m_MouseDelta{0, 0};
 		bool m_IsPanning = false;
-		glm::vec2 m_LastMousePosition;
-		glm::vec2 m_CanvasOffset;
+		glm::vec2 m_LastMousePosition{0, 0};
+		glm::vec2 m_CanvasOffset{0, 0};
 	};
 }
 

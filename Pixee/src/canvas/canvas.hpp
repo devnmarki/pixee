@@ -26,11 +26,14 @@ namespace pixee
 		bool mouseToCanvasPosition(const glm::dvec2& position, glm::ivec2& out) const;
 
 		void setPosition(const glm::vec2& position);
+		void setZoom(int zoom);
 
 		int getWidth() const;
 		int getHeight() const;
 		glm::vec2 getPosition();
 		uint32_t getBackgroundColor() const;
+		int getZoom() const;
+		SDL_Texture* getCanvasTexture();
 
 	private:
 		int m_Width;
