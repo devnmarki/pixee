@@ -12,8 +12,11 @@ namespace pixee
 
 		Window::~Window()
 		{
-			SDL_DestroyWindow(m_Handle);
-			SDL_DestroyRenderer(m_Renderer);
+			if (m_Renderer) 
+				SDL_DestroyRenderer(m_Renderer);
+			
+			if (m_Handle)
+				SDL_DestroyWindow(m_Handle);
 		}
 
 		void Window::create()
@@ -35,6 +38,7 @@ namespace pixee
 
 		void Window::beginFrame() const
 		{
+			SDL_SetRenderDrawColor(m_Renderer, 20, 20, 20, 255);
 			SDL_RenderClear(m_Renderer);
 		}
 
@@ -57,6 +61,16 @@ namespace pixee
 		SDL_Renderer* Window::getRenderer() const
 		{
 			return m_Renderer;
+		}
+
+		int Window::getWidth() const
+		{
+			return m_Specs.width;
+		}
+
+		int Window::getHeight() const
+		{
+			return m_Specs.height;
 		}
 	}
 }

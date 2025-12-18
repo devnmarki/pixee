@@ -11,6 +11,7 @@ target_include_directories(Core
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/vendor/SDL/include
+        ${CMAKE_SOURCE_DIR}/vendor/glm/glm
 )
 
 target_link_libraries(Core

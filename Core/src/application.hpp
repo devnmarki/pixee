@@ -7,11 +7,13 @@
 #include <cassert>
 #include <ranges>
 #include <unordered_set>
+#include <print>
 
 #include "window.hpp"
 #include "layer.hpp"
-#include "utils.hpp"
+#include "time.hpp"
 #include "event/key_events.hpp"
+#include "event/mouse_events.hpp"
 
 namespace pixee
 {
@@ -60,6 +62,19 @@ namespace pixee
 			std::shared_ptr<Window> getWindow() const;
 			SDL_Renderer* getRenderer() const;
 			LayerStack& getLayerStack();
+
+		private:
+			void handleEvents(SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys, std::unordered_set<event::MouseButton>& heldButtons);
+			
+			void handleKeyPressedEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys);
+			void handleKeyReleasedEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys);
+			void handleKeyDownEvent(const SDL_Event& e, std::unordered_set<SDL_Keycode>& heldKeys);
+			
+			void handleButtonPressedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
+			void handleButtonReleasedEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
+			void handleButtonDownEvent(const SDL_Event& e, std::unordered_set<event::MouseButton>& heldButtons);
+			void handleMouseMovedEvent(const SDL_Event& e);
+			void handleMouseScrolledEvent(const SDL_Event& e);
 
 		private:
 			ApplicationSpecification m_Specs;

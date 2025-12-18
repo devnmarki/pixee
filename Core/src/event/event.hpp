@@ -11,7 +11,7 @@ namespace pixee
 		enum class EventType {
 			None = 0,
 			KeyPressed, KeyReleased, KeyDown,
-			ButtonPressed, ButtonReleased
+			MouseButtonPressed, MouseButtonReleased, MouseButtonDown, MouseMoved, MouseScrolled
 		};
 
 #define EVENT_CLASS_TYPE(type) static EventType getStaticType() { return EventType::type; }\

@@ -14,11 +14,12 @@ namespace pixee
 		class KeyEvent : public Event
 		{
 		public:
-			inline SDL_Keycode getKeyCode() const { return m_KeyCode; }
+			SDL_Keycode getKeyCode() const { return m_KeyCode; }
 
 		protected:
 			KeyEvent(SDL_Keycode keyCode) : m_KeyCode(keyCode) { }
 
+		protected:
 			SDL_Keycode m_KeyCode;
 		};
 

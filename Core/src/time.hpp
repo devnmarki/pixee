@@ -1,5 +1,5 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef TIME_HPP
+#define TIME_HPP
 
 namespace pixee
 {
