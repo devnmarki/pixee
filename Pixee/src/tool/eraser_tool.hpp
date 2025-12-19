@@ -1,26 +1,22 @@
-#ifndef PEN_TOOL_HPP
-#define PEN_TOOL_HPP
+#ifndef ERASER_TOOL_HPP
+#define ERASER_TOOL_HPP
 
 #include "tool/tool.hpp"
-#include "layers/ui_layer.hpp"
-#include "ui/color_picker_panel.hpp"
-#include "utils.hpp"
 
 namespace pixee
 {
-	class PenTool : public Tool
+	class EraserTool : public Tool
 	{
 	public:
-		PenTool(Canvas& canvas);
-		virtual ~PenTool() = default;
-
+		EraserTool(Canvas& canvas);
+	
 		void update() override;
 
 		bool onMouseButtonDown(event::MouseButtonDownEvent& e) override;
 		bool onMouseButtonReleased(event::MouseButtonReleasedEvent& e) override;
 
 	private:
-		bool m_IsDrawing = false;
+		bool m_IsErasing = false;
 		bool m_FirstClick = true;
 
 		glm::vec2 m_LastCanvasPixelPos{ 0, 0 };

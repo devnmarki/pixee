@@ -10,7 +10,7 @@ namespace pixee
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
 
-		m_ActiveTool = std::make_unique<PenTool>(*m_Canvas);
+		m_ActiveTool = std::make_shared<PenTool>(*m_Canvas);
 	}
 
 	void EditorLayer::onUpdate()
@@ -29,6 +29,7 @@ namespace pixee
 	void EditorLayer::onEvent(event::Event& event)
 	{
 		event::EventDispatcher dispatcher(event);
+		dispatcher.dispatch<event::KeyPressedEvent>([this](event::KeyPressedEvent& e) { return onKeyPressed(e); });
 		dispatcher.dispatch<event::KeyDownEvent>([this](event::KeyDownEvent& e) { return onKeyDown(e); });
 		dispatcher.dispatch<event::KeyReleasedEvent>([this](event::KeyReleasedEvent& e) { return onKeyReleased(e); });
 
@@ -97,6 +98,20 @@ namespace pixee
 		SDL_RenderSetClipRect(r, nullptr);
 	}
 
+	bool EditorLayer::onKeyPressed(event::KeyPressedEvent& e)
+	{
+		if (e.getKeyCode() == SDLK_b)
+		{
+			m_ActiveTool = std::make_shared<PenTool>(*m_Canvas);
+		}
+		else if (e.getKeyCode() == SDLK_e)
+		{
+			m_ActiveTool = std::make_shared<EraserTool>(*m_Canvas);
+		}
+
+		return false;
+	}
+
 	bool EditorLayer::onKeyDown(event::KeyDownEvent& e)
 	{
 		return false;
@@ -147,9 +162,6 @@ namespace pixee
 		glm::ivec2 newPixelPos;
 		bool inCanvas = m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos);
 
-		if (e.getButton() == event::MouseButton::Right && inCanvas)
-			erasePixel(newPixelPos);
-
 		m_ActiveTool->onMouseButtonDown(e);
 
 		return false;
@@ -174,13 +186,5 @@ namespace pixee
 		handleCanvasZooming(e);
 
 		return false;
-	}
-
-	void EditorLayer::erasePixel(const glm::ivec2& pixelPos)
-	{
-		if (m_Canvas->pixelAlreadyExists(pixelPos, m_Canvas->getBackgroundColor()))
-			return;
-
-		m_Canvas->setPixel(pixelPos, m_Canvas->getBackgroundColor()); 
 	}
 }

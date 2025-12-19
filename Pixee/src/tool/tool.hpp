@@ -31,6 +31,9 @@ namespace pixee
 	protected:
 		Tool(ToolType toolType, Canvas& canvas);
 
+		void placePixel(const glm::ivec2& pixelPos, uint32_t color);
+		void drawLine(int x0, int y0, int x1, int y1, uint32_t color);
+
 	protected:
 		ToolType m_ToolType;
 		Canvas& m_Canvas;

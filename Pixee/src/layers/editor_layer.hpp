@@ -12,6 +12,7 @@
 #include "graphics/checker_texture.hpp"
 #include "layers/ui_layer.hpp"
 #include "tool/pen_tool.hpp"
+#include "tool/eraser_tool.hpp"
 
 namespace pixee
 {
@@ -33,6 +34,7 @@ namespace pixee
 		
 		void drawBackground();
 
+		bool onKeyPressed(event::KeyPressedEvent& e);
 		bool onKeyDown(event::KeyDownEvent& e);
 		bool onKeyReleased(event::KeyReleasedEvent& e);
 
@@ -56,7 +58,7 @@ namespace pixee
 		glm::vec2 m_LastMousePosition{ 0, 0 };
 		glm::vec2 m_CanvasOffset{ 0, 0 };
 
-		std::unique_ptr<Tool> m_ActiveTool;
+		std::shared_ptr<Tool> m_ActiveTool;
 	};
 }
 
