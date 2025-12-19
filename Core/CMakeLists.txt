@@ -12,12 +12,14 @@ target_include_directories(Core
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/vendor/SDL/include
         ${CMAKE_SOURCE_DIR}/vendor/glm/glm
+        ${CMAKE_SOURCE_DIR}/vendor/imgui
 )
 
 target_link_libraries(Core
     PUBLIC
         SDL2
         SDL2main
+        imgui
 )
 
 add_custom_command(TARGET Core POST_BUILD

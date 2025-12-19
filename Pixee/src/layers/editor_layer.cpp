@@ -9,20 +9,21 @@ namespace pixee
 		m_Canvas = std::make_shared<Canvas>(64, 64, m_CanvasPosition);
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
+
+		m_ActiveTool = std::make_unique<PenTool>(*m_Canvas);
 	}
 
 	void EditorLayer::onUpdate()
 	{
-		if (m_IsPanning)
-			m_IsDrawing = false;
-
-		handleDrawing();
+		m_ActiveTool->update();
 	}
 
 	void EditorLayer::onRender()
 	{
 		drawBackground();
 		m_Canvas->render();
+
+		m_ActiveTool->render();
 	}
 
 	void EditorLayer::onEvent(event::Event& event)
@@ -36,20 +37,6 @@ namespace pixee
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
 		dispatcher.dispatch<event::MouseScrolledEvent>([this](event::MouseScrolledEvent& e) { return onMouseScroll(e); });
-	}
-
-	void EditorLayer::handleDrawing()
-	{
-		if (!m_IsDrawing)
-			return;
-
-		glm::ivec2 newPixelPos;
-		constexpr uint32_t newPixelColor = utils::ARGB(255, 0, 0, 255);
-
-		if (!m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos))
-			return;
-
-		placePixel(newPixelPos, newPixelColor);
 	}
 
 	void EditorLayer::handlePanning(event::MouseMovedEvent& e)
@@ -133,14 +120,13 @@ namespace pixee
 			return true;
 		}
 
+		m_ActiveTool->onMouseButtonPressed(e);
+
 		return false;
 	}
 
 	bool EditorLayer::onMouseReleased(event::MouseButtonReleasedEvent& e)
 	{
-		if (e.getButton() == event::MouseButton::Left)
-			m_IsDrawing = false;
-
 		if (e.getButton() == event::MouseButton::Middle && m_IsPanning)
 		{
 			m_IsPanning = false;
@@ -151,6 +137,8 @@ namespace pixee
 			return true;
 		}
 
+		m_ActiveTool->onMouseButtonReleased(e);
+
 		return false;
 	}
 
@@ -159,11 +147,10 @@ namespace pixee
 		glm::ivec2 newPixelPos;
 		bool inCanvas = m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos);
 
-		if (e.getButton() == event::MouseButton::Left)
-			m_IsDrawing = true;
-
 		if (e.getButton() == event::MouseButton::Right && inCanvas)
 			erasePixel(newPixelPos);
+
+		m_ActiveTool->onMouseButtonDown(e);
 
 		return false;
 	}
@@ -177,6 +164,8 @@ namespace pixee
 
 		handlePanning(e);
 
+		m_ActiveTool->onMouseMoved(e);
+
 		return false;
 	}
 
@@ -185,14 +174,6 @@ namespace pixee
 		handleCanvasZooming(e);
 
 		return false;
-	}
-
-	void EditorLayer::placePixel(const glm::ivec2& pixelPos, uint32_t color)
-	{
-		if (m_Canvas->pixelAlreadyExists(pixelPos, color))
-			return;
-
-		m_Canvas->setPixel(pixelPos, color);
 	}
 
 	void EditorLayer::erasePixel(const glm::ivec2& pixelPos)

@@ -18,6 +18,16 @@ namespace pixee
 
 			m_Window = std::make_shared<Window>(m_Specs.windowSpecs);
 			m_Window->create();
+
+			IMGUI_CHECKVERSION();
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+			ImGui::StyleColorsDark();
+
+			ImGui_ImplSDL2_InitForSDLRenderer(m_Window->getHandle(), m_Window->getRenderer());
+			ImGui_ImplSDLRenderer2_Init(m_Window->getRenderer());
 		}
 
 		Application::~Application()
@@ -64,6 +74,8 @@ namespace pixee
 
 				if (SDL_PollEvent(&event))
 				{
+					ImGui_ImplSDL2_ProcessEvent(&event);
+
 					handleEvents(event, heldKeys, heldButtons);
 				}
 
@@ -73,11 +85,46 @@ namespace pixee
 				for (const auto& layer : m_LayerStack)
 					layer->onUpdate();
 
+				ImGui_ImplSDLRenderer2_NewFrame();
+				ImGui_ImplSDL2_NewFrame();
+				ImGui::NewFrame();
+
+				static bool opt_fullscreen = true;
+				static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+
+				ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBackground;
+				if (opt_fullscreen) {
+					const ImGuiViewport* viewport = ImGui::GetMainViewport();
+					ImGui::SetNextWindowPos(viewport->WorkPos);
+					ImGui::SetNextWindowSize(viewport->WorkSize);
+					ImGui::SetNextWindowViewport(viewport->ID);
+					window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+					window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+				}
+
+				ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
+				ImGui::Begin("MyDockSpace", nullptr, window_flags);
+				ImGui::PopStyleColor();
+
+				ImGuiIO& io = ImGui::GetIO();
+				if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable) {
+					ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+					ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+				}
+				ImGui::End();
+
 				m_Window->beginFrame();
-				
+
+				for (const auto& layer : m_LayerStack)
+					layer->onGuiRender();
+
+				ImGui::Render();
+
 				for (const auto& layer : m_LayerStack)
 					layer->onRender();
-
+				
+				ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), m_Window->getRenderer());
+				
 				m_Window->endFrame();
 
 				frameTime = SDL_GetTicks() - frameStart;
