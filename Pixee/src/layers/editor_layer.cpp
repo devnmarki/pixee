@@ -9,20 +9,21 @@ namespace pixee
 		m_Canvas = std::make_shared<Canvas>(64, 64, m_CanvasPosition);
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
+
+		m_ActiveTool = std::make_unique<PenTool>(*m_Canvas);
 	}
 
 	void EditorLayer::onUpdate()
 	{
-		if (m_IsPanning)
-			m_IsDrawing = false;
-
-		handleDrawing();
+		m_ActiveTool->update();
 	}
 
 	void EditorLayer::onRender()
 	{
 		drawBackground();
 		m_Canvas->render();
+
+		m_ActiveTool->render();
 	}
 
 	void EditorLayer::onEvent(event::Event& event)
@@ -36,47 +37,6 @@ namespace pixee
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
 		dispatcher.dispatch<event::MouseScrolledEvent>([this](event::MouseScrolledEvent& e) { return onMouseScroll(e); });
-	}
-
-	void EditorLayer::handleDrawing()
-	{
-		if (!m_IsDrawing)
-			return;
-
-		glm::ivec2 currentPixelPos;
-
-		// Convert mouse position to canvas coordinates
-		if (!m_Canvas->mouseToCanvasPosition(m_MousePosition, currentPixelPos))
-			return;
-
-		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
-		ui::ColorPickerPanel& colorPicker = uiLayer->getColorPickerPanel();
-		glm::vec4 newColor = colorPicker.getSelectedColor();
-
-		const uint32_t newPixelColor = utils::ARGB(
-			static_cast<uint32_t>(newColor.r * 255),
-			static_cast<uint32_t>(newColor.g * 255),
-			static_cast<uint32_t>(newColor.b * 255),
-			static_cast<uint32_t>(newColor.a * 255)
-		);
-
-		if (m_FirstClick)
-		{
-			placePixel(currentPixelPos, newPixelColor);
-			m_LastCanvasPixelPos = currentPixelPos;
-			m_FirstClick = false;
-		}
-		else
-		{
-			drawLine(
-				m_LastCanvasPixelPos.x,
-				m_LastCanvasPixelPos.y,
-				currentPixelPos.x,
-				currentPixelPos.y,
-				newPixelColor
-			);
-			m_LastCanvasPixelPos = currentPixelPos;
-		}
 	}
 
 	void EditorLayer::handlePanning(event::MouseMovedEvent& e)
@@ -137,32 +97,6 @@ namespace pixee
 		SDL_RenderSetClipRect(r, nullptr);
 	}
 
-	void EditorLayer::drawLine(int x0, int y0, int x1, int y1, uint32_t color)
-	{
-		int dx = std::abs(x1 - x0);
-		int dy = -std::abs(y1 - y0);
-		int sx = x0 < x1 ? 1 : -1;
-		int sy = y0 < y1 ? 1 : -1;
-		int err = dx + dy;
-
-		while (true) {
-			// Draw the pixel at the current coordinates
-			placePixel(glm::ivec2(x0, y0), color);
-
-			if (x0 == x1 && y0 == y1) break;
-
-			int e2 = 2 * err;
-			if (e2 >= dy) {
-				err += dy;
-				x0 += sx;
-			}
-			if (e2 <= dx) {
-				err += dx;
-				y0 += sy;
-			}
-		}
-	}
-
 	bool EditorLayer::onKeyDown(event::KeyDownEvent& e)
 	{
 		return false;
@@ -186,17 +120,13 @@ namespace pixee
 			return true;
 		}
 
+		m_ActiveTool->onMouseButtonPressed(e);
+
 		return false;
 	}
 
 	bool EditorLayer::onMouseReleased(event::MouseButtonReleasedEvent& e)
 	{
-		if (e.getButton() == event::MouseButton::Left)
-		{
-			m_IsDrawing = false;
-			m_FirstClick = true;
-		}
-
 		if (e.getButton() == event::MouseButton::Middle && m_IsPanning)
 		{
 			m_IsPanning = false;
@@ -207,6 +137,8 @@ namespace pixee
 			return true;
 		}
 
+		m_ActiveTool->onMouseButtonReleased(e);
+
 		return false;
 	}
 
@@ -215,14 +147,10 @@ namespace pixee
 		glm::ivec2 newPixelPos;
 		bool inCanvas = m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos);
 
-		if (e.getButton() == event::MouseButton::Left)
-		{
-			m_IsDrawing = true;
-			return true;
-		}
-
 		if (e.getButton() == event::MouseButton::Right && inCanvas)
 			erasePixel(newPixelPos);
+
+		m_ActiveTool->onMouseButtonDown(e);
 
 		return false;
 	}
@@ -236,6 +164,8 @@ namespace pixee
 
 		handlePanning(e);
 
+		m_ActiveTool->onMouseMoved(e);
+
 		return false;
 	}
 
@@ -244,14 +174,6 @@ namespace pixee
 		handleCanvasZooming(e);
 
 		return false;
-	}
-
-	void EditorLayer::placePixel(const glm::ivec2& pixelPos, uint32_t color)
-	{
-		if (m_Canvas->pixelAlreadyExists(pixelPos, color))
-			return;
-
-		m_Canvas->setPixel(pixelPos, color);
 	}
 
 	void EditorLayer::erasePixel(const glm::ivec2& pixelPos)

@@ -1,8 +1,4 @@
 #include "ui_layer.hpp"
-#include "ui_layer.hpp"
-#include "ui_layer.hpp"
-#include "ui_layer.hpp"
-#include "ui_layer.hpp"
 
 namespace pixee
 {

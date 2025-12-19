@@ -1,5 +1,5 @@
-#ifndef EDITORLAYER_HPP
-#define EDITORLAYER_HPP
+#ifndef EDITOR_LAYER_HPP
+#define EDITOR_LAYER_HPP
 
 #include <print>
 #include <algorithm>
@@ -11,6 +11,7 @@
 #include "canvas/canvas.hpp"
 #include "graphics/checker_texture.hpp"
 #include "layers/ui_layer.hpp"
+#include "tool/pen_tool.hpp"
 
 namespace pixee
 {
@@ -23,13 +24,14 @@ namespace pixee
 		void onRender() override;
 		void onEvent(event::Event& event) override;
 
+		Canvas& getCanvas() { return *m_Canvas; }
+		const Canvas& getCanvas() const { return *m_Canvas; }
+
 	private:
-		void handleDrawing();
 		void handlePanning(event::MouseMovedEvent& e);
 		void handleCanvasZooming(event::MouseScrolledEvent& e);
 		
 		void drawBackground();
-		void drawLine(int x0, int y0, int x1, int y1, uint32_t color);
 
 		bool onKeyDown(event::KeyDownEvent& e);
 		bool onKeyReleased(event::KeyReleasedEvent& e);
@@ -40,7 +42,6 @@ namespace pixee
 		bool onMouseMoved(event::MouseMovedEvent& e);
 		bool onMouseScroll(event::MouseScrolledEvent& e);
 
-		void placePixel(const glm::ivec2& pixelPos, uint32_t color);
 		void erasePixel(const glm::ivec2& pixelPos);
 
 	private:
@@ -49,15 +50,13 @@ namespace pixee
 		std::shared_ptr<gfx::CheckerTexture> m_CheckerTextureBG;
 
 		glm::dvec2 m_MousePosition{ 0, 0 };
-		bool m_IsDrawing = false;
 
 		glm::dvec2 m_MouseDelta{ 0, 0 };
 		bool m_IsPanning = false;
 		glm::vec2 m_LastMousePosition{ 0, 0 };
 		glm::vec2 m_CanvasOffset{ 0, 0 };
 
-		bool m_FirstClick = true;
-		glm::vec2 m_LastCanvasPixelPos{ 0, 0 };
+		std::unique_ptr<Tool> m_ActiveTool;
 	};
 }
 

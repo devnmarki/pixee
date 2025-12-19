@@ -11,9 +11,9 @@ namespace pixee
 
 		void ColorPickerPanel::render()
 		{
-			ImGui::Begin("Color Picker");
+			ImGui::Begin(WINDOW_ID.c_str());
 
-			ImGui::ColorPicker4("", m_SelectedColor);
+			ImGui::ColorPicker4("##color_picker", m_SelectedColor);
 
 			ImGui::End();
 		}

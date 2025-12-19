@@ -1,6 +1,8 @@
 #ifndef UI_LAYER_HPP
 #define UI_LAYER_HPP
 
+#include <imgui_internal.h>
+
 #include "core.hpp"
 
 #include "ui/color_picker_panel.hpp"
