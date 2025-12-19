@@ -3,7 +3,7 @@
 namespace pixee
 {
 	EraserTool::EraserTool(Canvas& canvas)
-		: Tool(ToolType::Eraser, canvas)
+		: Tool("Eraser", ToolType::Eraser, canvas)
 	{
 
 	}

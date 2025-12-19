@@ -12,7 +12,6 @@ namespace pixee
 		class ColorPickerPanel
 		{
 		public:
-
 			ColorPickerPanel();
 
 			void render();

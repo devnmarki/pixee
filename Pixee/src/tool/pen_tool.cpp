@@ -3,7 +3,7 @@
 namespace pixee
 {
 	PenTool::PenTool(Canvas& canvas)
-		: Tool(ToolType::Pen, canvas)
+		: Tool("Pen", ToolType::Pen, canvas)
 	{
 
 	}

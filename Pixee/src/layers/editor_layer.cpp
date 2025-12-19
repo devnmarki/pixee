@@ -9,12 +9,19 @@ namespace pixee
 		m_Canvas = std::make_shared<Canvas>(64, 64, m_CanvasPosition);
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
-
-		m_ActiveTool = std::make_shared<PenTool>(*m_Canvas);
 	}
 
 	void EditorLayer::onUpdate()
 	{
+		if (!m_Initialized)
+		{
+			UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+			auto penTool = uiLayer->getToolsPanel().getToolByType(ToolType::Pen);
+			setActiveTool(penTool);
+
+			m_Initialized = true;
+		}
+
 		m_ActiveTool->update();
 	}
 
@@ -22,7 +29,6 @@ namespace pixee
 	{
 		drawBackground();
 		m_Canvas->render();
-
 		m_ActiveTool->render();
 	}
 
@@ -38,6 +44,11 @@ namespace pixee
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
 		dispatcher.dispatch<event::MouseScrolledEvent>([this](event::MouseScrolledEvent& e) { return onMouseScroll(e); });
+	}
+
+	void EditorLayer::setActiveTool(std::shared_ptr<Tool> tool)
+	{
+		m_ActiveTool = tool;
 	}
 
 	void EditorLayer::handlePanning(event::MouseMovedEvent& e)
@@ -100,13 +111,19 @@ namespace pixee
 
 	bool EditorLayer::onKeyPressed(event::KeyPressedEvent& e)
 	{
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+
 		if (e.getKeyCode() == SDLK_b)
 		{
-			m_ActiveTool = std::make_shared<PenTool>(*m_Canvas);
+			auto tool = uiLayer->getToolsPanel().getToolByType(ToolType::Pen);
+			if (tool)
+				setActiveTool(tool);
 		}
 		else if (e.getKeyCode() == SDLK_e)
 		{
-			m_ActiveTool = std::make_shared<EraserTool>(*m_Canvas);
+			auto tool = uiLayer->getToolsPanel().getToolByType(ToolType::Eraser);
+			if (tool)
+				setActiveTool(tool);
 		}
 
 		return false;

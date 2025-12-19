@@ -4,8 +4,8 @@
 
 namespace pixee
 {
-	Tool::Tool(ToolType toolType, Canvas& canvas)
-		: m_ToolType(toolType), m_Canvas(canvas)
+	Tool::Tool(const std::string& name, ToolType toolType, Canvas& canvas)
+		: m_Name(name), m_ToolType(toolType), m_Canvas(canvas)
 	{
 		
 	}

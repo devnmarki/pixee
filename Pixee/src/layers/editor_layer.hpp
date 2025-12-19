@@ -25,8 +25,11 @@ namespace pixee
 		void onRender() override;
 		void onEvent(event::Event& event) override;
 
+		void setActiveTool(std::shared_ptr<Tool> tool);
+
 		Canvas& getCanvas() { return *m_Canvas; }
 		const Canvas& getCanvas() const { return *m_Canvas; }
+		std::shared_ptr<Tool> getActiveToolPtr() { return m_ActiveTool; }
 
 	private:
 		void handlePanning(event::MouseMovedEvent& e);
@@ -44,8 +47,6 @@ namespace pixee
 		bool onMouseMoved(event::MouseMovedEvent& e);
 		bool onMouseScroll(event::MouseScrolledEvent& e);
 
-		void erasePixel(const glm::ivec2& pixelPos);
-
 	private:
 		std::shared_ptr<Canvas> m_Canvas;
 		glm::vec2 m_CanvasPosition{ 0, 0 };
@@ -59,6 +60,7 @@ namespace pixee
 		glm::vec2 m_CanvasOffset{ 0, 0 };
 
 		std::shared_ptr<Tool> m_ActiveTool;
+		bool m_Initialized = false;
 	};
 }
 
