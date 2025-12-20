@@ -9,6 +9,9 @@ namespace pixee
 		m_Canvas = std::make_shared<Canvas>(64, 64, m_CanvasPosition);
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
+
+		m_ToolShortcutMap[SDLK_b] = ToolType::Pen;
+		m_ToolShortcutMap[SDLK_e] = ToolType::Eraser;
 	}
 
 	void EditorLayer::onUpdate()
@@ -113,17 +116,12 @@ namespace pixee
 	{
 		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
 
-		if (e.getKeyCode() == SDLK_b)
+		auto it = m_ToolShortcutMap.find(e.getKeyCode());
+		if (it != m_ToolShortcutMap.end())
 		{
-			auto tool = uiLayer->getToolsPanel().getToolByType(ToolType::Pen);
-			if (tool)
-				setActiveTool(tool);
-		}
-		else if (e.getKeyCode() == SDLK_e)
-		{
-			auto tool = uiLayer->getToolsPanel().getToolByType(ToolType::Eraser);
-			if (tool)
-				setActiveTool(tool);
+			auto nextTool = uiLayer->getToolsPanel().getToolByType(m_ToolShortcutMap[e.getKeyCode()]);
+			if (nextTool)
+				setActiveTool(nextTool);
 		}
 
 		return false;

@@ -3,6 +3,7 @@
 
 #include <print>
 #include <algorithm>
+#include <unordered_map>
 
 #include <vec2.hpp>
 
@@ -61,6 +62,8 @@ namespace pixee
 
 		std::shared_ptr<Tool> m_ActiveTool;
 		bool m_Initialized = false;
+
+		std::unordered_map<SDL_Keycode, ToolType> m_ToolShortcutMap;
 	};
 }
 
