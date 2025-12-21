@@ -6,6 +6,7 @@ namespace pixee
 	RectTool::RectTool(Canvas& canvas)
 		: Tool("Rect", ToolType::Rect, canvas)
 	{
+		m_Name = m_FillMode ? "Rect (F)" : "Rect";
 	}
 
 	void RectTool::update()
@@ -37,8 +38,6 @@ namespace pixee
 		int screenW = size.x * m_Canvas.getZoom();
 		int screenH = size.y * m_Canvas.getZoom();
 
-		SDL_Rect dragRect = { screenX, screenY, screenW, screenH };
-
 		glm::vec4 currentColor = app.getLayer<UILayer>()->getColorPickerPanel().getSelectedColor();
 		SDL_SetRenderDrawColor(
 			renderer,
@@ -47,7 +46,29 @@ namespace pixee
 			static_cast<uint8_t>(currentColor.b * 255),
 			static_cast<uint8_t>(currentColor.a * 255)
 		);
-		SDL_RenderDrawRect(renderer, &dragRect);
+
+		int thickness = m_Canvas.getZoom();
+		for (int i = 0; i < thickness; i++)
+		{
+			SDL_Rect dragRect = {
+				screenX + i,
+				screenY + i,
+				screenW - (i * 2),
+				screenH - (i * 2)
+			};
+			SDL_RenderDrawRect(renderer, &dragRect);
+		}
+	}
+
+	bool RectTool::onKeyPressed(event::KeyPressedEvent& e)
+	{
+		if (e.getKeyCode() == SDLK_f)
+		{
+			m_FillMode = !m_FillMode;
+			m_Name = m_FillMode ? "Rect (F)" : "Rect";
+		}
+
+		return false;
 	}
 
 	bool RectTool::onMouseButtonPressed(event::MouseButtonPressedEvent& e)
@@ -69,7 +90,7 @@ namespace pixee
 		{
 			m_Dragging = false;
 
-			drawRectangle();
+			m_FillMode ? fillRectangle() : drawRectangle();
 		}
 		return false;
 	}
@@ -99,6 +120,30 @@ namespace pixee
 		{
 			m_Canvas.setPixel(glm::ivec2(topLeft.x, y), argbColor);
 			m_Canvas.setPixel(glm::ivec2(bottomRight.x, y), argbColor);
+		}
+	}
+
+	void RectTool::fillRectangle()
+	{
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+		glm::vec4 color = uiLayer->getColorPickerPanel().getSelectedColor();
+
+		uint32_t argbColor = utils::ARGB(
+			static_cast<uint8_t>(color.r * 255),
+			static_cast<uint8_t>(color.g * 255),
+			static_cast<uint8_t>(color.b * 255),
+			static_cast<uint8_t>(color.a * 255)
+		);
+
+		glm::ivec2 topLeft = glm::min(m_RectStartPos, m_RectEndPos);
+		glm::ivec2 bottomRight = glm::max(m_RectStartPos, m_RectEndPos);
+
+		for (int y = topLeft.y; y <= bottomRight.y; y++)
+		{
+			for (int x = topLeft.x; x <= bottomRight.x; x++)
+			{
+				m_Canvas.setPixel(glm::ivec2(x, y), argbColor);
+			}
 		}
 	}
 }

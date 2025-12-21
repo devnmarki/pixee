@@ -23,6 +23,8 @@ namespace pixee
 		virtual void update() { }
 		virtual void render() { }
 
+		virtual bool onKeyPressed(event::KeyPressedEvent& e) { return false; }
+
 		virtual bool onMouseButtonPressed(event::MouseButtonPressedEvent& e) { return false; }
 		virtual bool onMouseButtonReleased(event::MouseButtonReleasedEvent& e) { return false; }
 		virtual bool onMouseButtonDown(event::MouseButtonDownEvent& e) { return false; }
