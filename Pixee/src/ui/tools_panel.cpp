@@ -10,6 +10,7 @@ namespace pixee
 		{
 			m_AvailableTools.push_back(std::make_shared<PenTool>(canvas));
 			m_AvailableTools.push_back(std::make_shared<EraserTool>(canvas));
+			m_AvailableTools.push_back(std::make_shared<ColorPickerTool>(canvas));
 		}
 
 		void ToolsPanel::render(std::shared_ptr<Tool> activeTool, std::function<void(std::shared_ptr<Tool>)> onToolSelcted)
@@ -22,12 +23,14 @@ namespace pixee
 
 				bool selected = (availableTool == activeTool);
 				if (selected)
-					ImGui::PushStyleColor(ImGuiCol_Button, { 0.4f, 0.6f, 1.f, 1.f });
-
+					ImGui::PushStyleColor(ImGuiCol_Button, { 0.4f, 0.6f, 1.0f, 1.0f });
+				
+				ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + 50.0f);
 				if (ImGui::Button(availableTool->getName().c_str(), ImVec2(50.0f, 40.0f)))
 				{
 					onToolSelcted(availableTool);
 				}
+				ImGui::PopTextWrapPos();
 
 				if (selected)
 					ImGui::PopStyleColor();

@@ -51,6 +51,7 @@ namespace pixee
 
 	void EditorLayer::setActiveTool(std::shared_ptr<Tool> tool)
 	{
+		m_PreviousActiveTool = m_ActiveTool;
 		m_ActiveTool = tool;
 	}
 
@@ -120,6 +121,7 @@ namespace pixee
 		if (it != m_ToolShortcutMap.end())
 		{
 			auto nextTool = uiLayer->getToolsPanel().getToolByType(m_ToolShortcutMap[e.getKeyCode()]);
+			
 			if (nextTool)
 				setActiveTool(nextTool);
 		}
@@ -129,11 +131,35 @@ namespace pixee
 
 	bool EditorLayer::onKeyDown(event::KeyDownEvent& e)
 	{
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+		if (e.getKeyCode() == SDLK_LALT && !m_ColorPickerToolActive)
+		{
+			auto colorPickerTool = uiLayer->getToolsPanel().getToolByType(ToolType::ColorPicker);
+			if (colorPickerTool)
+			{
+				setActiveTool(colorPickerTool);
+				m_ColorPickerToolActive = true;
+			}
+		}
+
 		return false;
 	}
 
 	bool EditorLayer::onKeyReleased(event::KeyReleasedEvent& e)
 	{
+		if (e.getKeyCode() == SDLK_LALT && m_ColorPickerToolActive)
+		{
+			m_ColorPickerToolActive = false;
+
+			if (m_PreviousActiveTool)
+			{
+				UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+				auto prevTool = uiLayer->getToolsPanel().getToolByType(m_PreviousActiveTool->getToolType());
+				if (prevTool)
+					setActiveTool(prevTool);
+			}
+		}
+
 		return false;
 	}
 

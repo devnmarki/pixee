@@ -10,7 +10,8 @@ namespace pixee
 	enum class ToolType
 	{
 		Pen,
-		Eraser
+		Eraser,
+		ColorPicker
 	};
 
 	class Tool

@@ -3,5 +3,6 @@
 
 #include "pen_tool.hpp"
 #include "eraser_tool.hpp"
+#include "color_picker_tool.hpp"
 
 #endif

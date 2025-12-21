@@ -5,6 +5,8 @@
 
 #include "core.hpp"
 
+#include "utils.hpp"
+
 namespace pixee
 {
 	namespace ui
@@ -15,6 +17,9 @@ namespace pixee
 			ColorPickerPanel();
 
 			void render();
+
+			void setSelectedColor(const glm::vec4& newColor);
+			void setSelectedColor(uint32_t argb);
 
 			glm::vec4 getSelectedColor() const;
 		

@@ -62,8 +62,9 @@ namespace pixee
 
 		std::shared_ptr<Tool> m_ActiveTool;
 		bool m_Initialized = false;
-
 		std::unordered_map<SDL_Keycode, ToolType> m_ToolShortcutMap;
+		std::shared_ptr<Tool> m_PreviousActiveTool;
+		bool m_ColorPickerToolActive = false;
 	};
 }
 
