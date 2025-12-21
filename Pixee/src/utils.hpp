@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include <vec2.hpp>
 #include <vec4.hpp>
 
 namespace pixee
@@ -22,6 +23,14 @@ namespace pixee
 			uint8_t b = argb & 0xFF;
 
 			return glm::vec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+		}
+
+		inline glm::ivec2 absVec2Int(glm::ivec2 value)
+		{
+			int x = static_cast<int>(std::abs(value.x));
+			int y = static_cast<int>(std::abs(value.y));
+
+			return glm::ivec2(x, y);
 		}
 	}
 }

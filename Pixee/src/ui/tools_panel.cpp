@@ -11,6 +11,7 @@ namespace pixee
 			m_AvailableTools.push_back(std::make_shared<PenTool>(canvas));
 			m_AvailableTools.push_back(std::make_shared<EraserTool>(canvas));
 			m_AvailableTools.push_back(std::make_shared<ColorPickerTool>(canvas));
+			m_AvailableTools.push_back(std::make_shared<RectTool>(canvas));
 		}
 
 		void ToolsPanel::render(std::shared_ptr<Tool> activeTool, std::function<void(std::shared_ptr<Tool>)> onToolSelcted)

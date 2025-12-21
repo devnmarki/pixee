@@ -19,6 +19,10 @@ namespace pixee
 					{
 						std::println("Creating new canvas!");
 					}
+					if (ImGui::MenuItem("Open", "Ctrl+O"))
+					{
+						std::println("Loading canvas!");
+					}
 					if (ImGui::MenuItem("Save as", "Ctrl+Alt+S"))
 					{
 						std::println("Saving canvas first time!");
