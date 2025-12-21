@@ -7,7 +7,7 @@ namespace pixee
 	Tool::Tool(const std::string& name, ToolType toolType, Canvas& canvas)
 		: m_Name(name), m_ToolType(toolType), m_Canvas(canvas)
 	{
-		
+
 	}
 
 	bool Tool::onMouseMoved(event::MouseMovedEvent& e)

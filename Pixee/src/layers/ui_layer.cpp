@@ -5,7 +5,7 @@
 namespace pixee
 {
 	UILayer::UILayer()
-		: m_ColorPickerPanel()
+		: m_ColorPickerPanel(), m_MenuBar()
 	{
 		m_EditorLayer = core::Application::getInstance().getLayer<EditorLayer>();
 		m_ToolsPanel = std::make_shared<ui::ToolsPanel>(m_EditorLayer->getCanvas());
@@ -20,11 +20,11 @@ namespace pixee
 	void UILayer::onGuiRender()
 	{
 		m_ColorPickerPanel.render();
-
 		m_ToolsPanel->render(m_EditorLayer->getActiveToolPtr(), [this](std::shared_ptr<Tool> newTool) {
 			m_EditorLayer->setActiveTool(newTool);
 			std::println("New tool: {}", m_EditorLayer->getActiveToolPtr()->getName());
 		});
+		m_MenuBar.render();
 	}
 
 	bool UILayer::isHoveringUI()

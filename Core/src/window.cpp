@@ -27,6 +27,7 @@ namespace pixee
 				std::cout << "FATAL: Failed to create window handle! Error: " << SDL_GetError() << std::endl;
 				return;
 			}
+			SDL_SetWindowResizable(m_Handle, SDL_TRUE);
 
 			m_Renderer = SDL_CreateRenderer(m_Handle, -1, SDL_RENDERER_ACCELERATED);
 			if (!m_Renderer)

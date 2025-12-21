@@ -23,9 +23,7 @@ namespace pixee
 	private:
 		bool m_IsDrawing = false;
 		bool m_FirstClick = true;
-
 		glm::vec2 m_LastCanvasPixelPos{ 0, 0 };
-
 		glm::vec4 m_CurrentColor{ 0, 0, 0, 0 };
 	};
 }

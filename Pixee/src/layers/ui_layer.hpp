@@ -7,6 +7,7 @@
 
 #include "ui/color_picker_panel.hpp"
 #include "ui/tools_panel.hpp"
+#include "ui/menu_bar.hpp"
 
 
 namespace pixee
@@ -32,6 +33,7 @@ namespace pixee
 	private:
 		ui::ColorPickerPanel m_ColorPickerPanel;
 		std::shared_ptr<ui::ToolsPanel> m_ToolsPanel;
+		ui::MenuBar m_MenuBar;
 
 		EditorLayer* m_EditorLayer;
 	};
