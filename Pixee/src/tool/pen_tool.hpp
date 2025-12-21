@@ -15,6 +15,7 @@ namespace pixee
 		virtual ~PenTool() = default;
 
 		void update() override;
+		void render() override;
 
 		bool onMouseButtonDown(event::MouseButtonDownEvent& e) override;
 		bool onMouseButtonReleased(event::MouseButtonReleasedEvent& e) override;
@@ -24,6 +25,8 @@ namespace pixee
 		bool m_FirstClick = true;
 
 		glm::vec2 m_LastCanvasPixelPos{ 0, 0 };
+
+		glm::vec4 m_CurrentColor{ 0, 0, 0, 0 };
 	};
 }
 
