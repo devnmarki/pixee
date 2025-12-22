@@ -23,7 +23,7 @@ namespace pixee
 
 		if (uiLayer->getColorPickerPanel().getSelectedColor() == utils::toRGBA(targetPixel))
 			return false;
-
+		
 		std::println("Target Pixel: {}", targetPixel);
 
 		if (e.getButton() == event::MouseButton::Left)
