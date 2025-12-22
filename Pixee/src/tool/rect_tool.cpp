@@ -23,20 +23,8 @@ namespace pixee
 
 	void RectTool::render()
 	{
-		if (!m_Dragging)
-			return;
-
 		core::Application& app = core::Application::getInstance();
 		SDL_Renderer* renderer = app.getRenderer();
-
-		glm::ivec2 topLeft = glm::min(m_RectStartPos, m_RectEndPos);
-		glm::ivec2 bottomRight = glm::max(m_RectStartPos, m_RectEndPos);
-		glm::ivec2 size = bottomRight - topLeft + glm::ivec2(1, 1);
-
-		int screenX = static_cast<int>(m_Canvas.getPosition().x) + (topLeft.x * m_Canvas.getZoom());
-		int screenY = static_cast<int>(m_Canvas.getPosition().y) + (topLeft.y * m_Canvas.getZoom());
-		int screenW = size.x * m_Canvas.getZoom();
-		int screenH = size.y * m_Canvas.getZoom();
 
 		glm::vec4 currentColor = app.getLayer<UILayer>()->getColorPickerPanel().getSelectedColor();
 		SDL_SetRenderDrawColor(
@@ -47,16 +35,49 @@ namespace pixee
 			static_cast<uint8_t>(currentColor.a * 255)
 		);
 
-		int thickness = m_Canvas.getZoom();
-		for (int i = 0; i < thickness; i++)
+		if (m_Dragging)
 		{
-			SDL_Rect dragRect = {
-				screenX + i,
-				screenY + i,
-				screenW - (i * 2),
-				screenH - (i * 2)
+			glm::ivec2 topLeft = glm::min(m_RectStartPos, m_RectEndPos);
+			glm::ivec2 bottomRight = glm::max(m_RectStartPos, m_RectEndPos);
+			glm::ivec2 size = bottomRight - topLeft + glm::ivec2(1, 1);
+
+			int screenX = static_cast<int>(m_Canvas.getPosition().x) + (topLeft.x * m_Canvas.getZoom());
+			int screenY = static_cast<int>(m_Canvas.getPosition().y) + (topLeft.y * m_Canvas.getZoom());
+			int screenW = size.x * m_Canvas.getZoom();
+			int screenH = size.y * m_Canvas.getZoom();
+
+			int thickness = m_Canvas.getZoom();
+			for (int i = 0; i < thickness; i++)
+			{
+				SDL_Rect dragRect = {
+					screenX + i,
+					screenY + i,
+					screenW - (i * 2),
+					screenH - (i * 2)
+				};
+
+				if (!m_FillMode)
+					SDL_RenderDrawRect(renderer, &dragRect);
+				else
+					SDL_RenderFillRect(renderer, &dragRect);
+			}
+		}
+		else
+		{
+			glm::ivec2 placeholderPos;
+			if (!m_Canvas.mouseToCanvasPosition(m_MousePosition, placeholderPos))
+				return;
+
+			int screenX = static_cast<int>(m_Canvas.getPosition().x) + (placeholderPos.x * m_Canvas.getZoom());
+			int screenY = static_cast<int>(m_Canvas.getPosition().y) + (placeholderPos.y * m_Canvas.getZoom());
+
+			SDL_Rect placeholder = {
+				.x = screenX,
+				.y = screenY,
+				.w = m_Canvas.getZoom(),
+				.h = m_Canvas.getZoom()
 			};
-			SDL_RenderDrawRect(renderer, &dragRect);
+			SDL_RenderFillRect(renderer, &placeholder);
 		}
 	}
 

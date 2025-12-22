@@ -11,6 +11,7 @@ namespace pixee
 		EraserTool(Canvas& canvas);
 	
 		void update() override;
+		void render() override;
 
 		bool onMouseButtonDown(event::MouseButtonDownEvent& e) override;
 		bool onMouseButtonReleased(event::MouseButtonReleasedEvent& e) override;

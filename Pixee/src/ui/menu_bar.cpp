@@ -11,6 +11,8 @@ namespace pixee
 
 		void MenuBar::render()
 		{
+			ImGui::ShowDemoWindow();
+
 			if (ImGui::BeginMainMenuBar())
 			{
 				if (ImGui::BeginMenu("File"))
@@ -53,6 +55,10 @@ namespace pixee
 
 				if (ImGui::BeginMenu("Canvas"))
 				{
+					if (ImGui::MenuItem("Show Grid", "Ctrl+G"))
+					{
+						std::println("Grid shown!");
+					}
 					if (ImGui::MenuItem("Reize", "Ctrl+R"))
 					{
 						std::println("Resizing canvas!");

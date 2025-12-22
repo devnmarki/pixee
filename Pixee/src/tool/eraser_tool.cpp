@@ -39,6 +39,21 @@ namespace pixee
 		}
 	}
 
+	void EraserTool::render()
+	{
+		glm::ivec2 placeholderPos;
+		if (!m_Canvas.mouseToCanvasPosition(m_MousePosition, placeholderPos))
+			return;
+
+		int screenX = static_cast<int>(m_Canvas.getPosition().x) + (placeholderPos.x * m_Canvas.getZoom());
+		int screenY = static_cast<int>(m_Canvas.getPosition().y) + (placeholderPos.y * m_Canvas.getZoom());
+		SDL_Rect placeholderRect = { screenX, screenY, m_Canvas.getZoom(), m_Canvas.getZoom() };
+		SDL_Renderer* renderer = core::Application::getInstance().getRenderer();
+
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(renderer, &placeholderRect);
+	}
+
 	bool EraserTool::onMouseButtonDown(event::MouseButtonDownEvent& e)
 	{
 		if (e.getButton() == event::MouseButton::Left)
