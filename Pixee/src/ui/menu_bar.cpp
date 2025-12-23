@@ -11,8 +11,6 @@ namespace pixee
 
 		void MenuBar::render()
 		{
-			ImGui::ShowDemoWindow();
-
 			if (ImGui::BeginMainMenuBar())
 			{
 				if (ImGui::BeginMenu("File"))

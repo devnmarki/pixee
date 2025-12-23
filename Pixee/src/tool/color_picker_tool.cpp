@@ -16,7 +16,8 @@ namespace pixee
 	bool ColorPickerTool::onMouseButtonDown(event::MouseButtonDownEvent& e)
 	{
 		glm::ivec2 targetPixelPos;
-		m_Canvas.mouseToCanvasPosition(m_MousePosition, targetPixelPos);
+		if (!m_Canvas.mouseToCanvasPosition(m_MousePosition, targetPixelPos))
+			return false;
 
 		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
 		uint32_t targetPixel = m_Canvas.getPixel(targetPixelPos);
@@ -24,8 +25,6 @@ namespace pixee
 		if (uiLayer->getColorPickerPanel().getSelectedColor() == utils::toRGBA(targetPixel))
 			return false;
 		
-		std::println("Target Pixel: {}", targetPixel);
-
 		if (e.getButton() == event::MouseButton::Left)
 		{
 			uiLayer->getColorPickerPanel().setSelectedColor(targetPixel);
