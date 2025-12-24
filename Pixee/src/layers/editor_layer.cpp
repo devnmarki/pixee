@@ -238,6 +238,7 @@ namespace pixee
 	void EditorLayer::setMenuBarContext(UILayer* uiLayer)
 	{
 		ui::MenuBarContext menuBarCtx;
+		menuBarCtx.onOpen = [this]() { openImage(); };
 		menuBarCtx.onExportAsPNG = [this]() { exportCanvasImage(); };
 
 		uiLayer->getMenuBar().setContext(menuBarCtx);
@@ -269,9 +270,9 @@ namespace pixee
 				outBytes.push_back(a);
 			}
 
-			int result = stbi_write_png(outPath, m_Canvas->getWidth(), m_Canvas->getHeight(), 4, outBytes.data(), m_Canvas->getWidth() * 4);
+			int imgResult = stbi_write_png(outPath, m_Canvas->getWidth(), m_Canvas->getHeight(), 4, outBytes.data(), m_Canvas->getWidth() * 4);
 
-			if (result == 0)
+			if (imgResult == 0)
 			{
 				std::println("Failed to export image as PNG!");
 			}
@@ -286,5 +287,49 @@ namespace pixee
 		{
 			std::println("Save File Dialog Error: {}", NFD_GetError());
 		}
+	}
+
+	void EditorLayer::openImage()
+	{
+		nfdchar_t* outPath;
+		nfdfilteritem_t filterItem[1] = { { "Image Files", "png,jpg,jpeg,bmp" } };
+		nfdresult_t dialogResult = NFD_OpenDialog(&outPath, filterItem, 1, nullptr);
+
+		if (dialogResult == NFD_OKAY)
+		{
+			int width, height, channels;
+
+			unsigned char* data = stbi_load(outPath, &width, &height, &channels, 4);
+
+			if (data)
+			{
+				m_Canvas->resize(width, height);
+				auto& pixelBuffer = m_Canvas->getPixels();
+				pixelBuffer.clear();
+				pixelBuffer.reserve(width * height);
+
+				for (int i = 0; i < width * height; i++)
+				{
+					int base = i * 4;
+					uint8_t r = data[base + 0];
+					uint8_t g = data[base + 1];
+					uint8_t b = data[base + 2];
+					uint8_t a = data[base + 3];
+
+					uint32_t packedPixel =  (static_cast<uint32_t>(a) << 24) |
+											(static_cast<uint32_t>(r) << 16) |
+											(static_cast<uint32_t>(g) << 8) |
+											(static_cast<uint32_t>(b) << 0);
+				
+					pixelBuffer.push_back(packedPixel);
+				}
+			}
+
+			stbi_image_free(data);
+			
+			std::println("Loaded image successfully!");
+		}
+
+		NFD_FreePath(outPath);
 	}
 }

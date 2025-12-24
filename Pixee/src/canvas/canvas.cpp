@@ -29,6 +29,9 @@ namespace pixee
 
 	void Canvas::upload()
 	{
+		if (!m_PixelsTexture)
+			return;
+
 		SDL_UpdateTexture(
 			m_PixelsTexture,
 			nullptr,
@@ -45,6 +48,28 @@ namespace pixee
 
 		SDL_Rect dst = { m_Position.x, m_Position.y, m_Width * m_Zoom, m_Height * m_Zoom };
 		SDL_RenderCopy(renderer, m_PixelsTexture, nullptr, &dst);
+	}
+
+	void Canvas::resize(int newWidth, int newHeight)
+	{
+		setWidth(newWidth);
+		setHeight(newHeight);
+
+		m_PixelBuffer.assign(newWidth * newHeight, 0x00000000);
+
+		if (m_PixelsTexture != nullptr)
+			SDL_DestroyTexture(m_PixelsTexture);
+
+		SDL_Renderer* renderer = core::Application::getInstance().getRenderer();
+		m_PixelsTexture = SDL_CreateTexture(
+			renderer,
+			SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_STREAMING,
+			newWidth,
+			newHeight
+		);
+
+		SDL_SetTextureBlendMode(m_PixelsTexture, SDL_BLENDMODE_BLEND);
 	}
 
 	void Canvas::setPixel(const glm::ivec2& position, uint32_t color)
@@ -83,6 +108,16 @@ namespace pixee
 		out.y = localY / m_Zoom;
 
 		return true;
+	}
+
+	void Canvas::setWidth(int width)
+	{
+		m_Width = width;
+	}
+
+	void Canvas::setHeight(int height)
+	{
+		m_Height = height;
 	}
 
 	void Canvas::setPosition(const glm::vec2& position)

@@ -18,6 +18,7 @@ namespace pixee
 
 		void upload();
 		void render();
+		void resize(int newWidth, int newHeight);
 
 		void setPixel(const glm::ivec2& position, uint32_t color);
 		bool pixelAlreadyExists(const glm::ivec2& position, uint32_t color);
@@ -25,6 +26,8 @@ namespace pixee
 
 		bool mouseToCanvasPosition(const glm::dvec2& position, glm::ivec2& out) const;
 
+		void setWidth(int width);
+		void setHeight(int height);
 		void setPosition(const glm::vec2& position);
 		void setZoom(int zoom);
 

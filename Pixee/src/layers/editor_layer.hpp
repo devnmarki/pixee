@@ -7,6 +7,7 @@
 
 #include <vec2.hpp>
 #include <stb_image_write.h>
+#include <stb_image.h>
 
 #include "core.hpp"
 #include "utils.hpp"
@@ -51,6 +52,7 @@ namespace pixee
 
 		void setMenuBarContext(UILayer* uiLayer);
 		void exportCanvasImage();
+		void openImage();
 
 	private:
 		std::shared_ptr<Canvas> m_Canvas;
