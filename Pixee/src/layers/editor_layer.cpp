@@ -13,6 +13,7 @@ namespace pixee
 		m_ToolShortcutMap[SDLK_b] = ToolType::Pen;
 		m_ToolShortcutMap[SDLK_e] = ToolType::Eraser;
 		m_ToolShortcutMap[SDLK_r] = ToolType::Rect;
+		m_ToolShortcutMap[SDLK_g] = ToolType::BucketFill;
 	}
 
 	void EditorLayer::onUpdate()

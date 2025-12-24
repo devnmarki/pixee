@@ -15,6 +15,11 @@ namespace pixee
 			return (a << 24) | (r << 16) | (g << 8) | b;
 		}
 
+		inline constexpr uint32_t ARGB(const glm::vec4& rgba)
+		{
+			return ARGB(rgba.r, rgba.g, rgba.b, rgba.a);
+		}
+
 		inline glm::vec4 toRGBA(uint32_t argb)
 		{
 			uint8_t a = (argb >> 24) & 0xFF;

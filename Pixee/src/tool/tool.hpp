@@ -12,7 +12,8 @@ namespace pixee
 		Pen,
 		Eraser,
 		ColorPicker,
-		Rect
+		Rect,
+		BucketFill
 	};
 
 	class Tool
