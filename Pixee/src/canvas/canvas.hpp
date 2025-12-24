@@ -34,6 +34,7 @@ namespace pixee
 		uint32_t getBackgroundColor() const;
 		int getZoom() const;
 		SDL_Texture* getCanvasTexture();
+		std::vector<uint32_t>& getPixels() { return m_PixelBuffer; }
 
 	private:
 		int m_Width;

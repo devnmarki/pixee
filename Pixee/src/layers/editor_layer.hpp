@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include <vec2.hpp>
+#include <stb_image_write.h>
 
 #include "core.hpp"
 #include "utils.hpp"
@@ -47,6 +48,9 @@ namespace pixee
 		bool onMouseDown(event::MouseButtonDownEvent& e);
 		bool onMouseMoved(event::MouseMovedEvent& e);
 		bool onMouseScroll(event::MouseScrolledEvent& e);
+
+		void setMenuBarContext(UILayer* uiLayer);
+		void exportCanvasImage();
 
 	private:
 		std::shared_ptr<Canvas> m_Canvas;

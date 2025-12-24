@@ -24,6 +24,7 @@ namespace pixee
 
 		ui::ColorPickerPanel& getColorPickerPanel() { return m_ColorPickerPanel; }
 		ui::ToolsPanel& getToolsPanel() { return *m_ToolsPanel; }
+		ui::MenuBar& getMenuBar() { return m_MenuBar; }
 
 	private:
 		bool isHoveringUI();

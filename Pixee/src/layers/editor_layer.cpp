@@ -24,6 +24,8 @@ namespace pixee
 			auto penTool = uiLayer->getToolsPanel().getToolByType(ToolType::Pen);
 			setActiveTool(penTool);
 
+			setMenuBarContext(uiLayer);
+
 			m_Initialized = true;
 		}
 
@@ -231,5 +233,58 @@ namespace pixee
 		handleCanvasZooming(e);
 
 		return false;
+	}
+
+	void EditorLayer::setMenuBarContext(UILayer* uiLayer)
+	{
+		ui::MenuBarContext menuBarCtx;
+		menuBarCtx.onExportAsPNG = [this]() { exportCanvasImage(); };
+
+		uiLayer->getMenuBar().setContext(menuBarCtx);
+	}
+
+	void EditorLayer::exportCanvasImage()
+	{
+		nfdfilteritem_t filterItem[1] = { {"PNG", "png"} };
+		nfdchar_t* outPath;
+		nfdresult_t result = NFD_SaveDialog(&outPath, filterItem, 1, nullptr, "untitled.png");
+
+		if (result == NFD_OKAY)
+		{
+			std::println("Success! Exporting PNG file to: {}", outPath);
+
+			std::vector<uint8_t> outBytes;
+			outBytes.reserve(m_Canvas->getWidth() * m_Canvas->getHeight() * 4);
+
+			for (uint32_t pixel : m_Canvas->getPixels())
+			{
+				uint8_t a = (pixel >> 24) & 0xFF;
+				uint8_t r = (pixel >> 16) & 0xFF;
+				uint8_t g = (pixel >> 8) & 0xFF;
+				uint8_t b = (pixel >> 0) & 0xFF;
+
+				outBytes.push_back(r);
+				outBytes.push_back(g);
+				outBytes.push_back(b);
+				outBytes.push_back(a);
+			}
+
+			int result = stbi_write_png(outPath, m_Canvas->getWidth(), m_Canvas->getHeight(), 4, outBytes.data(), m_Canvas->getWidth() * 4);
+
+			if (result == 0)
+			{
+				std::println("Failed to export image as PNG!");
+			}
+
+			NFD_FreePath(outPath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			std::println("File dialog canceled!");
+		}
+		else
+		{
+			std::println("Save File Dialog Error: {}", NFD_GetError());
+		}
 	}
 }

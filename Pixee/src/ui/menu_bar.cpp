@@ -4,7 +4,8 @@ namespace pixee
 {
 	namespace ui
 	{
-		MenuBar::MenuBar()
+		MenuBar::MenuBar(const MenuBarContext& ctx)
+			: m_Ctx(ctx)
 		{
 
 		}
@@ -17,23 +18,23 @@ namespace pixee
 				{
 					if (ImGui::MenuItem("New", "Ctrl+N"))
 					{
-						std::println("Creating new canvas!");
+						m_Ctx.onNew();
 					}
 					if (ImGui::MenuItem("Open", "Ctrl+O"))
 					{
-						std::println("Loading canvas!");
+						m_Ctx.onOpen();
 					}
 					if (ImGui::MenuItem("Save as", "Ctrl+Alt+S"))
 					{
-						std::println("Saving canvas first time!");
+						m_Ctx.onSaveAs();
 					}
 					if (ImGui::MenuItem("Save", "Ctrl+S"))
 					{
-						std::println("Saving canvas again!");
+						m_Ctx.onSave();
 					}
 					if (ImGui::MenuItem("Export as PNG", "Ctrl+E"))
 					{
-						std::println("Exporting canvas as PNG!");
+						m_Ctx.onExportAsPNG();
 					}
 					ImGui::EndMenu();
 				}
@@ -65,6 +66,11 @@ namespace pixee
 				}
 				ImGui::EndMainMenuBar();
 			}
+		}
+
+		void MenuBar::setContext(const MenuBarContext& ctx)
+		{
+			m_Ctx = ctx;
 		}
 	}
 }
