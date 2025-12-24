@@ -3,7 +3,7 @@
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
 )
 
-add_executable(Pixee ${PIXEE_SRC})
+add_executable(Pixee ${PIXEE_SRC} "${CMAKE_SOURCE_DIR}/vendor/stb/stb_impl.cpp")
 
 set_target_properties(Pixee PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
 
@@ -17,6 +17,7 @@ target_include_directories(
 	${CMAKE_SOURCE_DIR}/vendor/SDL2/include
 	${CMAKE_SOURCE_DIR}/vendor/glm/glm
 	${CMAKE_SOURCE_DIR}/vendor/imgui
+	${CMAKE_SOURCE_DIR}/vendor/stb
 )
 
 target_link_libraries(Pixee  
