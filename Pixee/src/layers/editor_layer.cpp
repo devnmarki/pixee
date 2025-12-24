@@ -10,11 +10,23 @@ namespace pixee
 
 		m_CheckerTextureBG = std::make_shared<gfx::CheckerTexture>(16, utils::ARGB(200, 200, 200, 255), utils::ARGB(150, 150, 150, 255));
 
-		m_ActiveTool = std::make_unique<PenTool>(*m_Canvas);
+		m_ToolShortcutMap[SDLK_b] = ToolType::Pen;
+		m_ToolShortcutMap[SDLK_e] = ToolType::Eraser;
+		m_ToolShortcutMap[SDLK_r] = ToolType::Rect;
+		m_ToolShortcutMap[SDLK_g] = ToolType::BucketFill;
 	}
 
 	void EditorLayer::onUpdate()
 	{
+		if (!m_Initialized)
+		{
+			UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+			auto penTool = uiLayer->getToolsPanel().getToolByType(ToolType::Pen);
+			setActiveTool(penTool);
+
+			m_Initialized = true;
+		}
+
 		m_ActiveTool->update();
 	}
 
@@ -22,13 +34,13 @@ namespace pixee
 	{
 		drawBackground();
 		m_Canvas->render();
-
 		m_ActiveTool->render();
 	}
 
 	void EditorLayer::onEvent(event::Event& event)
 	{
 		event::EventDispatcher dispatcher(event);
+		dispatcher.dispatch<event::KeyPressedEvent>([this](event::KeyPressedEvent& e) { return onKeyPressed(e); });
 		dispatcher.dispatch<event::KeyDownEvent>([this](event::KeyDownEvent& e) { return onKeyDown(e); });
 		dispatcher.dispatch<event::KeyReleasedEvent>([this](event::KeyReleasedEvent& e) { return onKeyReleased(e); });
 
@@ -37,6 +49,12 @@ namespace pixee
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 		dispatcher.dispatch<event::MouseMovedEvent>([this](event::MouseMovedEvent& e) { return onMouseMoved(e); });
 		dispatcher.dispatch<event::MouseScrolledEvent>([this](event::MouseScrolledEvent& e) { return onMouseScroll(e); });
+	}
+
+	void EditorLayer::setActiveTool(std::shared_ptr<Tool> tool)
+	{
+		m_PreviousActiveTool = m_ActiveTool;
+		m_ActiveTool = tool;
 	}
 
 	void EditorLayer::handlePanning(event::MouseMovedEvent& e)
@@ -97,13 +115,55 @@ namespace pixee
 		SDL_RenderSetClipRect(r, nullptr);
 	}
 
+	bool EditorLayer::onKeyPressed(event::KeyPressedEvent& e)
+	{
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+
+		auto it = m_ToolShortcutMap.find(e.getKeyCode());
+		if (it != m_ToolShortcutMap.end())
+		{
+			auto nextTool = uiLayer->getToolsPanel().getToolByType(m_ToolShortcutMap[e.getKeyCode()]);
+			
+			if (nextTool)
+				setActiveTool(nextTool);
+		}
+
+		m_ActiveTool->onKeyPressed(e);
+
+		return false;
+	}
+
 	bool EditorLayer::onKeyDown(event::KeyDownEvent& e)
 	{
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+		if (e.getKeyCode() == SDLK_LALT && !m_ColorPickerToolActive)
+		{
+			auto colorPickerTool = uiLayer->getToolsPanel().getToolByType(ToolType::ColorPicker);
+			if (colorPickerTool)
+			{
+				setActiveTool(colorPickerTool);
+				m_ColorPickerToolActive = true;
+			}
+		}
+
 		return false;
 	}
 
 	bool EditorLayer::onKeyReleased(event::KeyReleasedEvent& e)
 	{
+		if (e.getKeyCode() == SDLK_LALT && m_ColorPickerToolActive)
+		{
+			m_ColorPickerToolActive = false;
+
+			if (m_PreviousActiveTool)
+			{
+				UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+				auto prevTool = uiLayer->getToolsPanel().getToolByType(m_PreviousActiveTool->getToolType());
+				if (prevTool)
+					setActiveTool(prevTool);
+			}
+		}
+
 		return false;
 	}
 
@@ -147,9 +207,6 @@ namespace pixee
 		glm::ivec2 newPixelPos;
 		bool inCanvas = m_Canvas->mouseToCanvasPosition(m_MousePosition, newPixelPos);
 
-		if (e.getButton() == event::MouseButton::Right && inCanvas)
-			erasePixel(newPixelPos);
-
 		m_ActiveTool->onMouseButtonDown(e);
 
 		return false;
@@ -174,13 +231,5 @@ namespace pixee
 		handleCanvasZooming(e);
 
 		return false;
-	}
-
-	void EditorLayer::erasePixel(const glm::ivec2& pixelPos)
-	{
-		if (m_Canvas->pixelAlreadyExists(pixelPos, m_Canvas->getBackgroundColor()))
-			return;
-
-		m_Canvas->setPixel(pixelPos, m_Canvas->getBackgroundColor()); 
 	}
 }

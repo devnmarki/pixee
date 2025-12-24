@@ -3,7 +3,7 @@
 namespace pixee
 {
 	PenTool::PenTool(Canvas& canvas)
-		: Tool(ToolType::Pen, canvas)
+		: Tool("Pen", ToolType::Pen, canvas)
 	{
 
 	}
@@ -20,13 +20,13 @@ namespace pixee
 
 		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
 		ui::ColorPickerPanel& colorPicker = uiLayer->getColorPickerPanel();
-		glm::vec4 newColor = colorPicker.getSelectedColor();
+		m_CurrentColor = colorPicker.getSelectedColor();
 
 		const uint32_t newPixelColor = utils::ARGB(
-			static_cast<uint32_t>(newColor.r * 255),
-			static_cast<uint32_t>(newColor.g * 255),
-			static_cast<uint32_t>(newColor.b * 255),
-			static_cast<uint32_t>(newColor.a * 255)
+			static_cast<uint32_t>(m_CurrentColor.r * 255),
+			static_cast<uint32_t>(m_CurrentColor.g * 255),
+			static_cast<uint32_t>(m_CurrentColor.b * 255),
+			static_cast<uint32_t>(m_CurrentColor.a * 255)
 		);
 
 		if (m_FirstClick)
@@ -46,6 +46,38 @@ namespace pixee
 			);
 			m_LastCanvasPixelPos = currentPixelPos;
 		}
+	}
+
+	void PenTool::render()
+	{
+		glm::ivec2 placeholderPixelPos;
+		if (!m_Canvas.mouseToCanvasPosition(m_MousePosition, placeholderPixelPos))
+			return;
+
+		SDL_Renderer* renderer = core::Application::getInstance().getRenderer();
+
+		int screenX = static_cast<int>(m_Canvas.getPosition().x) + (placeholderPixelPos.x * m_Canvas.getZoom());
+		int screenY = static_cast<int>(m_Canvas.getPosition().y) + (placeholderPixelPos.y * m_Canvas.getZoom());
+
+		SDL_Rect placeholderPixelRect = {
+			.x = screenX,
+			.y = screenY,
+			.w = m_Canvas.getZoom(),
+			.h = m_Canvas.getZoom()
+		};
+
+		UILayer* uiLayer = core::Application::getInstance().getLayer<UILayer>();
+		ui::ColorPickerPanel& colorPicker = uiLayer->getColorPickerPanel();
+		glm::vec4 activeColor = colorPicker.getSelectedColor();
+
+		SDL_SetRenderDrawColor(
+			renderer,
+			static_cast<uint8_t>(activeColor.r * 255),
+			static_cast<uint8_t>(activeColor.g * 255),
+			static_cast<uint8_t>(activeColor.b * 255),
+			static_cast<uint8_t>(activeColor.a * 255)
+		);
+		SDL_RenderFillRect(renderer, &placeholderPixelRect);
 	}
 
 	bool PenTool::onMouseButtonDown(event::MouseButtonDownEvent& e)
@@ -68,38 +100,5 @@ namespace pixee
 		}
 
 		return false;
-	}
-
-	void PenTool::placePixel(const glm::ivec2& pixelPos, uint32_t color)
-	{
-		if (m_Canvas.pixelAlreadyExists(pixelPos, color))
-			return;
-
-		m_Canvas.setPixel(pixelPos, color);
-	}
-
-	void PenTool::drawLine(int x0, int y0, int x1, int y1, uint32_t color)
-	{
-		int dx = std::abs(x1 - x0);
-		int dy = -std::abs(y1 - y0);
-		int sx = x0 < x1 ? 1 : -1;
-		int sy = y0 < y1 ? 1 : -1;
-		int err = dx + dy;
-
-		while (true) {
-			placePixel(glm::ivec2(x0, y0), color);
-
-			if (x0 == x1 && y0 == y1) break;
-
-			int e2 = 2 * err;
-			if (e2 >= dy) {
-				err += dy;
-				x0 += sx;
-			}
-			if (e2 <= dx) {
-				err += dx;
-				y0 += sy;
-			}
-		}
 	}
 }
