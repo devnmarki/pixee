@@ -10,6 +10,7 @@ project(Pixee)
 add_subdirectory(vendor/SDL2)
 add_subdirectory(vendor/glm)
 add_subdirectory(vendor/imgui)
+add_subdirectory(vendor/nfd)
 
 add_subdirectory(Core)
 add_subdirectory(Pixee)
