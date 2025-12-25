@@ -32,10 +32,6 @@ namespace pixee
 					{
 						m_Ctx.onSaveRequest();
 					}
-					if (ImGui::MenuItem("Export as PNG", "Ctrl+E"))
-					{
-						m_Ctx.onExportAsPNGRequest();
-					}
 					ImGui::EndMenu();
 				}
 

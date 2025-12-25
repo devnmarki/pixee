@@ -3,6 +3,7 @@
 namespace pixee
 {
 	EditorLayer::EditorLayer()
+		: m_OverlayLayer(nullptr)
 	{
 		m_CanvasPosition.x = static_cast<float>(core::Application::getInstance().getWindow()->getWidth() / 2 - 32 * 8);
 		m_CanvasPosition.y = static_cast<float>(core::Application::getInstance().getWindow()->getHeight() / 2 - 32 * 8);
@@ -241,57 +242,13 @@ namespace pixee
 	{
 		ui::MenuBarContext menuBarCtx;
 		menuBarCtx.onOpenRequest = [this]() { openImage(); };
-		menuBarCtx.onExportAsPNGRequest = [this]() { exportCanvasImage(); };
+		menuBarCtx.onSaveAsRequest = [this]() { saveFirstTime(); };
+		menuBarCtx.onSaveRequest = [this]() { save(); };
 		menuBarCtx.onNewRequest = [this]() { m_OverlayLayer->getNewCanvasModal().show(); };
 		
 		menuBarCtx.onShowGridRequest = [this]() { m_Canvas->toggleGrid(); };
 
 		uiLayer->getMenuBar().setContext(menuBarCtx);
-	}
-
-	void EditorLayer::exportCanvasImage()
-	{
-		nfdfilteritem_t filterItem[1] = { {"PNG", "png"} };
-		nfdchar_t* outPath;
-		nfdresult_t result = NFD_SaveDialog(&outPath, filterItem, 1, nullptr, "untitled.png");
-
-		if (result == NFD_OKAY)
-		{
-			std::println("Success! Exporting PNG file to: {}", outPath);
-
-			std::vector<uint8_t> outBytes;
-			outBytes.reserve(m_Canvas->getWidth() * m_Canvas->getHeight() * 4);
-
-			for (uint32_t pixel : m_Canvas->getPixels())
-			{
-				uint8_t a = (pixel >> 24) & 0xFF;
-				uint8_t r = (pixel >> 16) & 0xFF;
-				uint8_t g = (pixel >> 8) & 0xFF;
-				uint8_t b = (pixel >> 0) & 0xFF;
-
-				outBytes.push_back(r);
-				outBytes.push_back(g);
-				outBytes.push_back(b);
-				outBytes.push_back(a);
-			}
-
-			int imgResult = stbi_write_png(outPath, m_Canvas->getWidth(), m_Canvas->getHeight(), 4, outBytes.data(), m_Canvas->getWidth() * 4);
-
-			if (imgResult == 0)
-			{
-				std::println("Failed to export image as PNG!");
-			}
-
-			NFD_FreePath(outPath);
-		}
-		else if (result == NFD_CANCEL)
-		{
-			std::println("File dialog canceled!");
-		}
-		else
-		{
-			std::println("Save File Dialog Error: {}", NFD_GetError());
-		}
 	}
 
 	void EditorLayer::openImage()
@@ -331,6 +288,8 @@ namespace pixee
 			}
 
 			stbi_image_free(data);
+
+			m_CurrentSavePath = outPath;
 			
 			std::println("Loaded image successfully!");
 		}
@@ -343,5 +302,66 @@ namespace pixee
 		glm::vec2 newCanvasPos = m_Canvas->getPosition();
 
 		m_Canvas->reset(64, 64);
+	}
+
+	void EditorLayer::saveFirstTime()
+	{
+		nfdfilteritem_t filterItem[1] = { {"PNG", "png"} };
+		nfdchar_t* outPath;
+		nfdresult_t result = NFD_SaveDialog(&outPath, filterItem, 1, nullptr, "untitled.png");
+
+		if (result == NFD_OKAY)
+		{
+			std::println("Success! Exporting PNG file to: {}", outPath);
+
+			writeImage(outPath);
+
+			m_CurrentSavePath = outPath;
+
+			NFD_FreePath(outPath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			std::println("File dialog canceled!");
+		}
+		else
+		{
+			std::println("Save File Dialog Error: {}", NFD_GetError());
+		}
+
+		std::println("Current Save Name: {}", m_CurrentSavePath);
+	}
+
+	void EditorLayer::save()
+	{
+		if (m_CurrentSavePath.empty())
+			return;
+
+		writeImage(m_CurrentSavePath.c_str());
+	}
+	void EditorLayer::writeImage(const char* filename)
+	{
+		std::vector<uint8_t> outBytes;
+		outBytes.reserve(m_Canvas->getWidth() * m_Canvas->getHeight() * 4);
+
+		for (uint32_t pixel : m_Canvas->getPixels())
+		{
+			uint8_t a = (pixel >> 24) & 0xFF;
+			uint8_t r = (pixel >> 16) & 0xFF;
+			uint8_t g = (pixel >> 8) & 0xFF;
+			uint8_t b = (pixel >> 0) & 0xFF;
+
+			outBytes.push_back(r);
+			outBytes.push_back(g);
+			outBytes.push_back(b);
+			outBytes.push_back(a);
+		}
+
+		int imgResult = stbi_write_png(filename, m_Canvas->getWidth(), m_Canvas->getHeight(), 4, outBytes.data(), m_Canvas->getWidth() * 4);
+		
+		if (imgResult == 0)
+		{
+			std::println("Failed to export image as PNG!");
+		}
 	}
 }

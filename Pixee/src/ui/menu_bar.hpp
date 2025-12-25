@@ -16,7 +16,6 @@ namespace pixee
 			std::function<void()> onOpenRequest = []{};
 			std::function<void()> onSaveAsRequest = []{};
 			std::function<void()> onSaveRequest = []{};
-			std::function<void()> onExportAsPNGRequest = []{};
 
 			std::function<void()> onShowGridRequest = []{};
 			std::function<void()> onResizeRequest = []{};

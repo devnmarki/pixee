@@ -44,13 +44,13 @@ namespace pixee
 	{
 		SDL_Renderer* renderer = core::Application::getInstance().getRenderer();
 
-		if (m_ShowGrid)
-			renderGrid(renderer);
-
 		upload();
 
 		SDL_Rect dst = { m_Position.x, m_Position.y, m_Width * m_Zoom, m_Height * m_Zoom };
 		SDL_RenderCopy(renderer, m_PixelsTexture, nullptr, &dst);
+
+		if (m_ShowGrid)
+			renderGrid(renderer);
 	}
 
 	void Canvas::reset(int newWidth, int newHeight)

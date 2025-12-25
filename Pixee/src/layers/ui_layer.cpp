@@ -34,9 +34,7 @@ namespace pixee
 
 	bool UILayer::onKeyPressed(event::KeyPressedEvent& e)
 	{
-		if (e.getKeyCode() == SDLK_e && m_InputContext.ctrlDown)
-			m_MenuBar.getContext().onExportAsPNGRequest();
-		else if (e.getKeyCode() == SDLK_n && m_InputContext.ctrlDown)
+		if (e.getKeyCode() == SDLK_n && m_InputContext.ctrlDown)
 			m_MenuBar.getContext().onNewRequest();
 		else if (e.getKeyCode() == SDLK_o && m_InputContext.ctrlDown)
 			m_MenuBar.getContext().onOpenRequest();
