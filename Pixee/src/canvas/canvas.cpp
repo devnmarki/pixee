@@ -50,7 +50,7 @@ namespace pixee
 		SDL_RenderCopy(renderer, m_PixelsTexture, nullptr, &dst);
 	}
 
-	void Canvas::resize(int newWidth, int newHeight)
+	void Canvas::reset(int newWidth, int newHeight)
 	{
 		setWidth(newWidth);
 		setHeight(newHeight);

@@ -14,6 +14,7 @@
 #include "canvas/canvas.hpp"
 #include "graphics/checker_texture.hpp"
 #include "layers/ui_layer.hpp"
+#include "layers/overlay_layer.hpp"
 #include "tool/pen_tool.hpp"
 #include "tool/eraser_tool.hpp"
 
@@ -53,8 +54,11 @@ namespace pixee
 		void setMenuBarContext(UILayer* uiLayer);
 		void exportCanvasImage();
 		void openImage();
+		void createNewCanvas();
 
 	private:
+		OverlayLayer* m_OverlayLayer;
+
 		std::shared_ptr<Canvas> m_Canvas;
 		glm::vec2 m_CanvasPosition{ 0, 0 };
 		std::shared_ptr<gfx::CheckerTexture> m_CheckerTextureBG;

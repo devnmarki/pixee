@@ -22,6 +22,10 @@ namespace pixee
 		void onEvent(event::Event& e) override;
 		void onGuiRender() override;
 
+		bool onKeyPressed(event::KeyPressedEvent& e);
+		bool onKeyDown(event::KeyDownEvent& e);
+		bool onKeyReleased(event::KeyReleasedEvent& e);
+
 		ui::ColorPickerPanel& getColorPickerPanel() { return m_ColorPickerPanel; }
 		ui::ToolsPanel& getToolsPanel() { return *m_ToolsPanel; }
 		ui::MenuBar& getMenuBar() { return m_MenuBar; }
@@ -32,11 +36,18 @@ namespace pixee
 		bool onMouseDown(event::MouseButtonDownEvent& e);
 
 	private:
+		struct InputContext
+		{
+			bool ctrlDown = false;
+		};
+
 		ui::ColorPickerPanel m_ColorPickerPanel;
 		std::shared_ptr<ui::ToolsPanel> m_ToolsPanel;
 		ui::MenuBar m_MenuBar;
 
 		EditorLayer* m_EditorLayer;
+
+		InputContext m_InputContext;
 	};
 }
 

@@ -29,6 +29,8 @@ namespace pixee
 			m_Initialized = true;
 		}
 
+		m_OverlayLayer = core::Application::getInstance().getLayer<OverlayLayer>();
+
 		m_ActiveTool->update();
 	}
 
@@ -240,6 +242,8 @@ namespace pixee
 		ui::MenuBarContext menuBarCtx;
 		menuBarCtx.onOpen = [this]() { openImage(); };
 		menuBarCtx.onExportAsPNG = [this]() { exportCanvasImage(); };
+		//menuBarCtx.onNew = [this]() { createNewCanvas(); };
+		menuBarCtx.onNew = [this]() { m_OverlayLayer->getNewCanvasModal().show(); };
 
 		uiLayer->getMenuBar().setContext(menuBarCtx);
 	}
@@ -303,7 +307,7 @@ namespace pixee
 
 			if (data)
 			{
-				m_Canvas->resize(width, height);
+				m_Canvas->reset(width, height);
 				auto& pixelBuffer = m_Canvas->getPixels();
 				pixelBuffer.clear();
 				pixelBuffer.reserve(width * height);
@@ -331,5 +335,12 @@ namespace pixee
 		}
 
 		NFD_FreePath(outPath);
+	}
+	
+	void EditorLayer::createNewCanvas()
+	{
+		glm::vec2 newCanvasPos = m_Canvas->getPosition();
+
+		m_Canvas->reset(64, 64);
 	}
 }

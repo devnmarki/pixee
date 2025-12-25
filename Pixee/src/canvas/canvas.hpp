@@ -18,7 +18,7 @@ namespace pixee
 
 		void upload();
 		void render();
-		void resize(int newWidth, int newHeight);
+		void reset(int newWidth, int newHeight);
 
 		void setPixel(const glm::ivec2& position, uint32_t color);
 		bool pixelAlreadyExists(const glm::ivec2& position, uint32_t color);
