@@ -18,23 +18,23 @@ namespace pixee
 				{
 					if (ImGui::MenuItem("New", "Ctrl+N"))
 					{
-						m_Ctx.onNew();
+						m_Ctx.onNewRequest();
 					}
 					if (ImGui::MenuItem("Open", "Ctrl+O"))
 					{
-						m_Ctx.onOpen();
+						m_Ctx.onOpenRequest();
 					}
 					if (ImGui::MenuItem("Save as", "Ctrl+Alt+S"))
 					{
-						m_Ctx.onSaveAs();
+						m_Ctx.onSaveAsRequest();
 					}
 					if (ImGui::MenuItem("Save", "Ctrl+S"))
 					{
-						m_Ctx.onSave();
+						m_Ctx.onSaveRequest();
 					}
 					if (ImGui::MenuItem("Export as PNG", "Ctrl+E"))
 					{
-						m_Ctx.onExportAsPNG();
+						m_Ctx.onExportAsPNGRequest();
 					}
 					ImGui::EndMenu();
 				}
@@ -56,11 +56,11 @@ namespace pixee
 				{
 					if (ImGui::MenuItem("Show Grid", "Ctrl+G"))
 					{
-						std::println("Grid shown!");
+						m_Ctx.onShowGridRequest();
 					}
 					if (ImGui::MenuItem("Reize", "Ctrl+R"))
 					{
-						std::println("Resizing canvas!");
+						m_Ctx.onResizeRequest();
 					}
 					ImGui::EndMenu();
 				}

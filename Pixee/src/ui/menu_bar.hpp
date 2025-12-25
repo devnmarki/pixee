@@ -12,11 +12,14 @@ namespace pixee
 	{
 		struct MenuBarContext
 		{
-			std::function<void()> onNew = []{};
-			std::function<void()> onOpen = []{};
-			std::function<void()> onSaveAs = []{};
-			std::function<void()> onSave = []{};
-			std::function<void()> onExportAsPNG = []{};
+			std::function<void()> onNewRequest = []{};
+			std::function<void()> onOpenRequest = []{};
+			std::function<void()> onSaveAsRequest = []{};
+			std::function<void()> onSaveRequest = []{};
+			std::function<void()> onExportAsPNGRequest = []{};
+
+			std::function<void()> onShowGridRequest = []{};
+			std::function<void()> onResizeRequest = []{};
 		};
 
 		class MenuBar

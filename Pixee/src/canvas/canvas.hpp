@@ -26,10 +26,14 @@ namespace pixee
 
 		bool mouseToCanvasPosition(const glm::dvec2& position, glm::ivec2& out) const;
 
+		void renderGrid(SDL_Renderer* renderer);
+		void toggleGrid();
+
 		void setWidth(int width);
 		void setHeight(int height);
 		void setPosition(const glm::vec2& position);
 		void setZoom(int zoom);
+		void showGrid(bool show);
 
 		int getWidth() const;
 		int getHeight() const;
@@ -48,6 +52,8 @@ namespace pixee
 
 		SDL_Texture* m_PixelsTexture;
 		std::vector<uint32_t> m_PixelBuffer;
+
+		bool m_ShowGrid = false;
 	};
 }
 

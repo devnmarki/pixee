@@ -240,10 +240,11 @@ namespace pixee
 	void EditorLayer::setMenuBarContext(UILayer* uiLayer)
 	{
 		ui::MenuBarContext menuBarCtx;
-		menuBarCtx.onOpen = [this]() { openImage(); };
-		menuBarCtx.onExportAsPNG = [this]() { exportCanvasImage(); };
-		//menuBarCtx.onNew = [this]() { createNewCanvas(); };
-		menuBarCtx.onNew = [this]() { m_OverlayLayer->getNewCanvasModal().show(); };
+		menuBarCtx.onOpenRequest = [this]() { openImage(); };
+		menuBarCtx.onExportAsPNGRequest = [this]() { exportCanvasImage(); };
+		menuBarCtx.onNewRequest = [this]() { m_OverlayLayer->getNewCanvasModal().show(); };
+		
+		menuBarCtx.onShowGridRequest = [this]() { m_Canvas->toggleGrid(); };
 
 		uiLayer->getMenuBar().setContext(menuBarCtx);
 	}

@@ -44,6 +44,9 @@ namespace pixee
 	{
 		SDL_Renderer* renderer = core::Application::getInstance().getRenderer();
 
+		if (m_ShowGrid)
+			renderGrid(renderer);
+
 		upload();
 
 		SDL_Rect dst = { m_Position.x, m_Position.y, m_Width * m_Zoom, m_Height * m_Zoom };
@@ -110,6 +113,27 @@ namespace pixee
 		return true;
 	}
 
+	void Canvas::renderGrid(SDL_Renderer* renderer)
+	{
+		glm::ivec2 cp = glm::ivec2(m_Position);
+
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+		for (int y = 0; y < m_Height / 16; y++)
+		{
+			SDL_RenderDrawLine(renderer, cp.x, cp.y + y * 16 * m_Zoom, cp.x + m_Width * m_Zoom, cp.y + y * 16 * m_Zoom);
+		}
+
+		for (int x = 0; x < m_Width / 16; x++)
+		{
+			SDL_RenderDrawLine(renderer, cp.x + x * 16 * m_Zoom, cp.y, cp.x + x * 16 * m_Zoom, cp.y + m_Height * m_Zoom);
+		}
+	}
+
+	void Canvas::toggleGrid()
+	{
+		m_ShowGrid = !m_ShowGrid;
+	}
+
 	void Canvas::setWidth(int width)
 	{
 		m_Width = width;
@@ -128,6 +152,11 @@ namespace pixee
 	void Canvas::setZoom(int zoom)
 	{
 		m_Zoom = zoom;
+	}
+
+	void Canvas::showGrid(bool show)
+	{
+		m_ShowGrid = show;
 	}
 
 	int Canvas::getWidth() const
