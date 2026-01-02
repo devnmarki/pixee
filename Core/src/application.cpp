@@ -28,10 +28,14 @@ namespace pixee
 
 			ImGui_ImplSDL2_InitForSDLRenderer(m_Window->getHandle(), m_Window->getRenderer());
 			ImGui_ImplSDLRenderer2_Init(m_Window->getRenderer());
+
+			NFD_Init();
 		}
 
 		Application::~Application()
 		{
+			NFD_Quit();
+
 			SDL_Quit();
 
 			s_Instance = nullptr;

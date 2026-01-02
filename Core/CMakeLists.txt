@@ -13,6 +13,7 @@ target_include_directories(Core
         ${CMAKE_SOURCE_DIR}/vendor/SDL/include
         ${CMAKE_SOURCE_DIR}/vendor/glm/glm
         ${CMAKE_SOURCE_DIR}/vendor/imgui
+        ${CMAKE_SOURCE_DIR}/vendor/nfd/src/include
 )
 
 target_link_libraries(Core
@@ -20,6 +21,7 @@ target_link_libraries(Core
         SDL2
         SDL2main
         imgui
+        nfd
 )
 
 add_custom_command(TARGET Core POST_BUILD

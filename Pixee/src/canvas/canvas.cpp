@@ -29,6 +29,9 @@ namespace pixee
 
 	void Canvas::upload()
 	{
+		if (!m_PixelsTexture)
+			return;
+
 		SDL_UpdateTexture(
 			m_PixelsTexture,
 			nullptr,
@@ -45,6 +48,31 @@ namespace pixee
 
 		SDL_Rect dst = { m_Position.x, m_Position.y, m_Width * m_Zoom, m_Height * m_Zoom };
 		SDL_RenderCopy(renderer, m_PixelsTexture, nullptr, &dst);
+
+		if (m_ShowGrid)
+			renderGrid(renderer);
+	}
+
+	void Canvas::reset(int newWidth, int newHeight)
+	{
+		setWidth(newWidth);
+		setHeight(newHeight);
+
+		m_PixelBuffer.assign(newWidth * newHeight, 0x00000000);
+
+		if (m_PixelsTexture != nullptr)
+			SDL_DestroyTexture(m_PixelsTexture);
+
+		SDL_Renderer* renderer = core::Application::getInstance().getRenderer();
+		m_PixelsTexture = SDL_CreateTexture(
+			renderer,
+			SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_STREAMING,
+			newWidth,
+			newHeight
+		);
+
+		SDL_SetTextureBlendMode(m_PixelsTexture, SDL_BLENDMODE_BLEND);
 	}
 
 	void Canvas::setPixel(const glm::ivec2& position, uint32_t color)
@@ -85,6 +113,37 @@ namespace pixee
 		return true;
 	}
 
+	void Canvas::renderGrid(SDL_Renderer* renderer)
+	{
+		glm::ivec2 cp = glm::ivec2(m_Position);
+
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+		for (int y = 0; y < m_Height / 16; y++)
+		{
+			SDL_RenderDrawLine(renderer, cp.x, cp.y + y * 16 * m_Zoom, cp.x + m_Width * m_Zoom, cp.y + y * 16 * m_Zoom);
+		}
+
+		for (int x = 0; x < m_Width / 16; x++)
+		{
+			SDL_RenderDrawLine(renderer, cp.x + x * 16 * m_Zoom, cp.y, cp.x + x * 16 * m_Zoom, cp.y + m_Height * m_Zoom);
+		}
+	}
+
+	void Canvas::toggleGrid()
+	{
+		m_ShowGrid = !m_ShowGrid;
+	}
+
+	void Canvas::setWidth(int width)
+	{
+		m_Width = width;
+	}
+
+	void Canvas::setHeight(int height)
+	{
+		m_Height = height;
+	}
+
 	void Canvas::setPosition(const glm::vec2& position)
 	{
 		m_Position = position;
@@ -93,6 +152,11 @@ namespace pixee
 	void Canvas::setZoom(int zoom)
 	{
 		m_Zoom = zoom;
+	}
+
+	void Canvas::showGrid(bool show)
+	{
+		m_ShowGrid = show;
 	}
 
 	int Canvas::getWidth() const

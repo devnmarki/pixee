@@ -4,7 +4,8 @@ namespace pixee
 {
 	namespace ui
 	{
-		MenuBar::MenuBar()
+		MenuBar::MenuBar(const MenuBarContext& ctx)
+			: m_Ctx(ctx)
 		{
 
 		}
@@ -17,23 +18,19 @@ namespace pixee
 				{
 					if (ImGui::MenuItem("New", "Ctrl+N"))
 					{
-						std::println("Creating new canvas!");
+						m_Ctx.onNewRequest();
 					}
 					if (ImGui::MenuItem("Open", "Ctrl+O"))
 					{
-						std::println("Loading canvas!");
+						m_Ctx.onOpenRequest();
 					}
 					if (ImGui::MenuItem("Save as", "Ctrl+Alt+S"))
 					{
-						std::println("Saving canvas first time!");
+						m_Ctx.onSaveAsRequest();
 					}
 					if (ImGui::MenuItem("Save", "Ctrl+S"))
 					{
-						std::println("Saving canvas again!");
-					}
-					if (ImGui::MenuItem("Export as PNG", "Ctrl+E"))
-					{
-						std::println("Exporting canvas as PNG!");
+						m_Ctx.onSaveRequest();
 					}
 					ImGui::EndMenu();
 				}
@@ -55,16 +52,21 @@ namespace pixee
 				{
 					if (ImGui::MenuItem("Show Grid", "Ctrl+G"))
 					{
-						std::println("Grid shown!");
+						m_Ctx.onShowGridRequest();
 					}
 					if (ImGui::MenuItem("Reize", "Ctrl+R"))
 					{
-						std::println("Resizing canvas!");
+						m_Ctx.onResizeRequest();
 					}
 					ImGui::EndMenu();
 				}
 				ImGui::EndMainMenuBar();
 			}
+		}
+
+		void MenuBar::setContext(const MenuBarContext& ctx)
+		{
+			m_Ctx = ctx;
 		}
 	}
 }

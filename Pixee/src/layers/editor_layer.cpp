@@ -3,6 +3,7 @@
 namespace pixee
 {
 	EditorLayer::EditorLayer()
+		: m_OverlayLayer(nullptr)
 	{
 		m_CanvasPosition.x = static_cast<float>(core::Application::getInstance().getWindow()->getWidth() / 2 - 32 * 8);
 		m_CanvasPosition.y = static_cast<float>(core::Application::getInstance().getWindow()->getHeight() / 2 - 32 * 8);
@@ -24,8 +25,12 @@ namespace pixee
 			auto penTool = uiLayer->getToolsPanel().getToolByType(ToolType::Pen);
 			setActiveTool(penTool);
 
+			setMenuBarContext(uiLayer);
+
 			m_Initialized = true;
 		}
+
+		m_OverlayLayer = core::Application::getInstance().getLayer<OverlayLayer>();
 
 		m_ActiveTool->update();
 	}
@@ -231,5 +236,132 @@ namespace pixee
 		handleCanvasZooming(e);
 
 		return false;
+	}
+
+	void EditorLayer::setMenuBarContext(UILayer* uiLayer)
+	{
+		ui::MenuBarContext menuBarCtx;
+		menuBarCtx.onOpenRequest = [this]() { openImage(); };
+		menuBarCtx.onSaveAsRequest = [this]() { saveFirstTime(); };
+		menuBarCtx.onSaveRequest = [this]() { save(); };
+		menuBarCtx.onNewRequest = [this]() { m_OverlayLayer->getNewCanvasModal().show(); };
+		
+		menuBarCtx.onShowGridRequest = [this]() { m_Canvas->toggleGrid(); };
+
+		uiLayer->getMenuBar().setContext(menuBarCtx);
+	}
+
+	void EditorLayer::openImage()
+	{
+		nfdchar_t* outPath;
+		nfdfilteritem_t filterItem[1] = { { "Image Files", "png,jpg,jpeg,bmp" } };
+		nfdresult_t dialogResult = NFD_OpenDialog(&outPath, filterItem, 1, nullptr);
+
+		if (dialogResult == NFD_OKAY)
+		{
+			int width, height, channels;
+
+			unsigned char* data = stbi_load(outPath, &width, &height, &channels, 4);
+
+			if (data)
+			{
+				m_Canvas->reset(width, height);
+				auto& pixelBuffer = m_Canvas->getPixels();
+				pixelBuffer.clear();
+				pixelBuffer.reserve(width * height);
+
+				for (int i = 0; i < width * height; i++)
+				{
+					int base = i * 4;
+					uint8_t r = data[base + 0];
+					uint8_t g = data[base + 1];
+					uint8_t b = data[base + 2];
+					uint8_t a = data[base + 3];
+
+					uint32_t packedPixel =  (static_cast<uint32_t>(a) << 24) |
+											(static_cast<uint32_t>(r) << 16) |
+											(static_cast<uint32_t>(g) << 8) |
+											(static_cast<uint32_t>(b) << 0);
+				
+					pixelBuffer.push_back(packedPixel);
+				}
+			}
+
+			stbi_image_free(data);
+
+			m_CurrentSavePath = outPath;
+			
+			std::println("Loaded image successfully!");
+		}
+
+		NFD_FreePath(outPath);
+	}
+	
+	void EditorLayer::createNewCanvas()
+	{
+		glm::vec2 newCanvasPos = m_Canvas->getPosition();
+
+		m_Canvas->reset(64, 64);
+	}
+
+	void EditorLayer::saveFirstTime()
+	{
+		nfdfilteritem_t filterItem[1] = { {"PNG", "png"} };
+		nfdchar_t* outPath;
+		nfdresult_t result = NFD_SaveDialog(&outPath, filterItem, 1, nullptr, "untitled.png");
+
+		if (result == NFD_OKAY)
+		{
+			std::println("Success! Exporting PNG file to: {}", outPath);
+
+			writeImage(outPath);
+
+			m_CurrentSavePath = outPath;
+
+			NFD_FreePath(outPath);
+		}
+		else if (result == NFD_CANCEL)
+		{
+			std::println("File dialog canceled!");
+		}
+		else
+		{
+			std::println("Save File Dialog Error: {}", NFD_GetError());
+		}
+
+		std::println("Current Save Name: {}", m_CurrentSavePath);
+	}
+
+	void EditorLayer::save()
+	{
+		if (m_CurrentSavePath.empty())
+			return;
+
+		writeImage(m_CurrentSavePath.c_str());
+	}
+	void EditorLayer::writeImage(const char* filename)
+	{
+		std::vector<uint8_t> outBytes;
+		outBytes.reserve(m_Canvas->getWidth() * m_Canvas->getHeight() * 4);
+
+		for (uint32_t pixel : m_Canvas->getPixels())
+		{
+			uint8_t a = (pixel >> 24) & 0xFF;
+			uint8_t r = (pixel >> 16) & 0xFF;
+			uint8_t g = (pixel >> 8) & 0xFF;
+			uint8_t b = (pixel >> 0) & 0xFF;
+
+			outBytes.push_back(r);
+			outBytes.push_back(g);
+			outBytes.push_back(b);
+			outBytes.push_back(a);
+		}
+
+		int imgResult = stbi_write_png(filename, m_Canvas->getWidth(), m_Canvas->getHeight(), 4, outBytes.data(), m_Canvas->getWidth() * 4);
+		
+		if (imgResult == 0)
+		{
+			std::println("Failed to export image as PNG!");
+		}
 	}
 }

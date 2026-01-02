@@ -3,5 +3,6 @@
 
 #include "editor_layer.hpp"
 #include "ui_layer.hpp"
+#include "overlay_layer.hpp"
 
 #endif

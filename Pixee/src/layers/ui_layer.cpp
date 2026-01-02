@@ -5,7 +5,7 @@
 namespace pixee
 {
 	UILayer::UILayer()
-		: m_ColorPickerPanel(), m_MenuBar()
+		: m_ColorPickerPanel(), m_MenuBar(), m_InputContext()
 	{
 		m_EditorLayer = core::Application::getInstance().getLayer<EditorLayer>();
 		m_ToolsPanel = std::make_shared<ui::ToolsPanel>(m_EditorLayer->getCanvas());
@@ -14,6 +14,10 @@ namespace pixee
 	void UILayer::onEvent(event::Event& e)
 	{
 		event::EventDispatcher dispatcher(e);
+		dispatcher.dispatch<event::KeyPressedEvent>([this](event::KeyPressedEvent& e) { return onKeyPressed(e); });
+		dispatcher.dispatch<event::KeyReleasedEvent>([this](event::KeyReleasedEvent& e) { return onKeyReleased(e); });
+		dispatcher.dispatch<event::KeyDownEvent>([this](event::KeyDownEvent& e) { return onKeyDown(e); });
+
 		dispatcher.dispatch<event::MouseButtonDownEvent>([this](event::MouseButtonDownEvent& e) { return onMouseDown(e); });
 	}
 
@@ -24,6 +28,34 @@ namespace pixee
 			m_EditorLayer->setActiveTool(newTool);
 		});
 		m_MenuBar.render();
+
+		//ImGui::ShowDemoWindow();
+	}
+
+	bool UILayer::onKeyPressed(event::KeyPressedEvent& e)
+	{
+		if (e.getKeyCode() == SDLK_n && m_InputContext.ctrlDown)
+			m_MenuBar.getContext().onNewRequest();
+		else if (e.getKeyCode() == SDLK_o && m_InputContext.ctrlDown)
+			m_MenuBar.getContext().onOpenRequest();
+
+		return false;
+	}
+
+	bool UILayer::onKeyDown(event::KeyDownEvent& e)
+	{
+		if (e.getKeyCode() == SDLK_LCTRL)
+			m_InputContext.ctrlDown = true;
+
+		return false;
+	}
+
+	bool UILayer::onKeyReleased(event::KeyReleasedEvent& e)
+	{
+		if (e.getKeyCode() == SDLK_LCTRL)
+			m_InputContext.ctrlDown = false;
+
+		return false;
 	}
 
 	bool UILayer::isHoveringUI()

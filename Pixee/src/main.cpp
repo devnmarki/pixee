@@ -12,6 +12,7 @@ int main(int argc, char* argv[])
 	pixee::core::Application app(appSpecs);
 	app.pushLayer<pixee::EditorLayer>();
 	app.pushLayer<pixee::UILayer>();
+	app.pushLayer<pixee::OverlayLayer>();
 	app.run();
 
 	return 0;

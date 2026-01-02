@@ -6,12 +6,15 @@
 #include <unordered_map>
 
 #include <vec2.hpp>
+#include <stb_image_write.h>
+#include <stb_image.h>
 
 #include "core.hpp"
 #include "utils.hpp"
 #include "canvas/canvas.hpp"
 #include "graphics/checker_texture.hpp"
 #include "layers/ui_layer.hpp"
+#include "layers/overlay_layer.hpp"
 #include "tool/pen_tool.hpp"
 #include "tool/eraser_tool.hpp"
 
@@ -38,33 +41,50 @@ namespace pixee
 		
 		void drawBackground();
 
+		// Key Events
 		bool onKeyPressed(event::KeyPressedEvent& e);
 		bool onKeyDown(event::KeyDownEvent& e);
 		bool onKeyReleased(event::KeyReleasedEvent& e);
 
+		// Mouse Events
 		bool onMousePress(event::MouseButtonPressedEvent& e);
 		bool onMouseReleased(event::MouseButtonReleasedEvent& e);
 		bool onMouseDown(event::MouseButtonDownEvent& e);
 		bool onMouseMoved(event::MouseMovedEvent& e);
 		bool onMouseScroll(event::MouseScrolledEvent& e);
 
+		void setMenuBarContext(UILayer* uiLayer);
+		void openImage();
+		void createNewCanvas();
+		void saveFirstTime();
+		void save();
+		void writeImage(const char* filename);
+
 	private:
+		// Refs
+		OverlayLayer* m_OverlayLayer;
+
+		// Canvas
 		std::shared_ptr<Canvas> m_Canvas;
 		glm::vec2 m_CanvasPosition{ 0, 0 };
 		std::shared_ptr<gfx::CheckerTexture> m_CheckerTextureBG;
 
+		// Mouse Movement
 		glm::dvec2 m_MousePosition{ 0, 0 };
-
 		glm::dvec2 m_MouseDelta{ 0, 0 };
 		bool m_IsPanning = false;
 		glm::vec2 m_LastMousePosition{ 0, 0 };
 		glm::vec2 m_CanvasOffset{ 0, 0 };
 
+		// Tool Management
 		std::shared_ptr<Tool> m_ActiveTool;
 		bool m_Initialized = false;
 		std::unordered_map<SDL_Keycode, ToolType> m_ToolShortcutMap;
 		std::shared_ptr<Tool> m_PreviousActiveTool;
 		bool m_ColorPickerToolActive = false;
+
+		// Serialization
+		std::string m_CurrentSavePath = "";
 	};
 }
 
